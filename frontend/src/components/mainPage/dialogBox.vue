@@ -295,46 +295,48 @@ defineExpose({startChat, startLoading, backUploading, getReturn})
 .draggable-container {
   display: flex;
   align-items: center;
-  width: 550px;
-  background-color: #f5f5f5;
-  border-radius: 30px;
-  padding: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ddd;
+  width: 560px;
+  background: radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.18), transparent 60%),
+  rgba(15, 23, 42, 0.95);
+  border-radius: 999px;
+  padding: 10px 16px;
+  box-shadow:
+      0 18px 40px rgba(15, 23, 42, 0.45),
+      0 0 0 1px rgba(148, 163, 184, 0.5);
   cursor: move;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   justify-content: center;
+  color: #e5e7eb;
 }
 
 .draggable-container:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow:
+      0 26px 55px rgba(15, 23, 42, 0.6),
+      0 0 0 1px rgba(148, 163, 184, 0.7);
   transform: translateY(-2px);
 }
 
 .drag-handle {
   margin-right: 10px;
   cursor: grab;
-}
-
-.drag-handle img {
-  width: 24px;
-  height: 24px;
+  color: #9ca3af;
 }
 
 .message-input {
   flex: 1;
   border: none;
-  padding: 10px;
+  padding: 10px 14px;
   outline: none;
-  border-radius: 20px;
-  font-size: 16px;
-  font-family: 'Roboto', sans-serif;
+  border-radius: 999px;
+  font-size: 15px;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
-  background-color: transparent;
+  background-color: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
 }
 
-.send-button svg {
-  fill: #000;
+.message-input::placeholder {
+  color: #6b7280;
 }
 
 .upload-wrapper {
@@ -345,18 +347,10 @@ defineExpose({startChat, startLoading, backUploading, getReturn})
 
 .arrow-left, .arrow-right {
   font-size: 24px;
-  color: #409eff;
-  cursor: pointer;
+  color: #93c5fd;
 }
 
 .arrow-left:hover, .arrow-right:hover {
-  color: #66b1ff;
+  color: #bfdbfe;
 }
-
-.input-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
 </style>

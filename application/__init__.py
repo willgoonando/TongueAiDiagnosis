@@ -9,9 +9,14 @@ def create_app():
     Base.metadata.create_all(bind=engine)
     
     app = FastAPI()
+    # 前端开发环境端口可能会变化（比如 5173/5174/5175），这里统一放开常用本地端口
     origins = [
         "http://127.0.0.1:5173",
         "http://localhost:5173",
+        "http://127.0.0.1:5174",
+        "http://localhost:5174",
+        "http://127.0.0.1:5175",
+        "http://localhost:5175",
     ]
     app.add_middleware(
         CORSMiddleware,

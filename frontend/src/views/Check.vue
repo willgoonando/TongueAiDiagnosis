@@ -122,26 +122,55 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 <template>
   <div class="back-ground">
-    <div class="content">
-      <div class="sidebar-container">
-        <div class="sidebar-header">
-          <el-input v-model="newItemLabel" placeholder="Input record name" size="large"/>
-          <el-button type="primary" size="large" @click="addItem" @keydown="handleKeyDown">Add</el-button>
-        </div>
-        <div class="sidebar-list">
-          <div
-              v-for="item in items"
-              :key="item.id"
-              :class="['sidebar-item', { active: activeItem === item.id }]"
-              @click="handleItemClick(item.id)"
-          >
-            {{ item.label }}
+    <div class="ai-shell">
+      <div class="ai-shell-header">
+        <div class="ai-title-block">
+          <div class="ai-title">AI Tongue Diagnosis Lab</div>
+          <div class="ai-subtitle">
+            Upload your tongue image and chat with the AI for Traditional Chinese Medicine based insights.
           </div>
         </div>
+        <div class="ai-meta">
+          <span class="ai-meta-pill">⚙ Real‑time analysis</span>
+          <span class="ai-meta-pill">🩺 TCM tongue features</span>
+        </div>
       </div>
-      <div class="main-container">
-        <GuidePage v-if="showGuide" ref="guidePageRef"/>
-        <Main ref="mainPageRef" @back-id="handleBackId" v-else/>
+
+      <div class="content">
+        <div class="sidebar-container">
+          <div class="sidebar-header">
+            <div class="sidebar-header-text">
+              <div class="sidebar-title">Diagnosis Sessions</div>
+              <div class="sidebar-subtitle">Manage and review your tongue analysis history.</div>
+            </div>
+            <el-button type="primary" size="small" @click="addItem" @keydown="handleKeyDown">
+              New
+            </el-button>
+          </div>
+          <el-input
+              v-model="newItemLabel"
+              placeholder="Name this session (e.g. 'Morning check')"
+              size="small"
+              class="sidebar-input"
+          />
+          <div class="sidebar-list">
+            <div
+                v-for="item in items"
+                :key="item.id"
+                :class="['sidebar-item', { active: activeItem === item.id }]"
+                @click="handleItemClick(item.id)"
+            >
+              <div class="sidebar-item-main">
+                <span class="sidebar-item-label">{{ item.label }}</span>
+                <span v-if="item.temp" class="sidebar-item-badge">Draft</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="main-container">
+          <GuidePage v-if="showGuide" ref="guidePageRef"/>
+          <Main ref="mainPageRef" @back-id="handleBackId" v-else/>
+        </div>
       </div>
     </div>
   </div>
@@ -149,75 +178,223 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
 <style scoped>
 .back-ground {
-  background: linear-gradient(200deg, #f3e7e9, #cddffa);
-  height: 100vh;
+  min-height: 100vh;
+  padding: 96px 24px 32px;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  background:
+      radial-gradient(circle at top left, #fee2e2 0, transparent 45%),
+      radial-gradient(circle at bottom right, #e0f2fe 0, transparent 55%),
+      #f5f7fb;
+}
+
+.ai-shell {
+  width: 100%;
+  max-width: 1280px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 28px;
+  box-shadow:
+      0 18px 45px rgba(15, 23, 42, 0.12),
+      0 0 0 1px rgba(148, 163, 184, 0.08);
+  padding: 24px 28px 24px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 18px;
+}
+
+.ai-shell-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.ai-title-block {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+}
+
+.ai-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ai-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  max-width: 520px;
+}
+
+.ai-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-meta-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #1e293b;
+  background: #eff6ff;
+  border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
 .content {
   display: flex;
   flex: 1;
   overflow: hidden;
+  gap: 18px;
+}
+
+.main-container {
+  flex: 1;
+  padding: 0;
+  border-radius: 20px;
+  background: #f9fafb;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  overflow: hidden;
 }
 
 .sidebar-container {
-  width: 250px;
+  width: 260px;
   height: 100%;
-  background-color: #f8f9fa;
-  border-right: 1px solid #ddd;
-  padding: 10px;
+  background: #f9fafb;
+  border-radius: 18px;
+  padding: 14px 14px 16px;
   display: flex;
   flex-direction: column;
-  z-index: 3;
+  gap: 10px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .sidebar-header {
   display: flex;
-  gap: 5px;
-  margin-bottom: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sidebar-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.sidebar-subtitle {
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+.sidebar-input {
+  margin-top: 4px;
 }
 
 .sidebar-list {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  margin-top: 6px;
   overflow-y: auto;
 }
 
 .sidebar-item {
   background: #ffffff;
-  padding: 10px 15px;
+  padding: 10px 12px;
   border-radius: 12px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.3s ease;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-  margin-right: 5px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.sidebar-item:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: #f1f5f9;
 }
 
 .sidebar-item.active {
-  background: #409eff;
+  background: linear-gradient(135deg, #2563eb 0%, #22c55e 100%);
   color: white;
+  border-color: transparent;
 }
 
-.delete-icon {
-  font-size: 18px;
-  cursor: pointer;
-  transition: 0.2s;
+.sidebar-item-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
 }
 
-.delete-icon:hover {
-  color: red;
+.sidebar-item-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.main-container {
-  flex: 1;
-  padding: 0;
+.sidebar-item-badge {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(248, 250, 252, 0.9);
+  color: #0f172a;
+}
+
+@media (max-width: 1024px) {
+  .back-ground {
+    padding: 88px 16px 24px;
+  }
+
+  .ai-shell {
+    padding: 20px 18px;
+  }
+
+  .content {
+    gap: 14px;
+  }
+
+  .sidebar-container {
+    width: 230px;
+  }
+}
+
+@media (max-width: 768px) {
+  .back-ground {
+    padding: 80px 12px 20px;
+  }
+
+  .ai-shell {
+    padding: 18px 14px;
+  }
+
+  .ai-shell-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .content {
+    flex-direction: column;
+  }
+
+  .sidebar-container {
+    width: 100%;
+    height: auto;
+    flex-shrink: 0;
+  }
 }
 </style>

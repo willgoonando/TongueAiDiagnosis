@@ -1,99 +1,72 @@
+"""用户相关 HTTP 接口（Controller 层）
+
+本模块对应 Java 项目中的 UserController，职责是：
+- 暴露 /api/user 下的接口：注册、登录、获取当前用户信息与历史舌诊记录
+- 不写具体业务逻辑，全部委托给 application.services.user_service 中的函数
+
+当前主要接口：
+- POST /api/user/register   用户注册
+- PUT  /api/user/login      用户登录，返回 JWT
+- GET  /api/user/info       获取当前登录用户信息
+- GET  /api/user/record     获取用户历史舌诊记录
+"""
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import Annotated
-from ..core import create_access_token, get_current_user
+
+from ..core import get_current_user
 from ..models import schemas
-from ..orm import register_user, login_user, get_user, get_user_record
 from ..orm.database import get_db
+from ..services import (
+    register_user_service,
+    login_user_service,
+    get_user_info_service,
+    get_user_record_service,
+)
+
 
 router_user = APIRouter()
 
+
 @router_user.post('/register', response_model=schemas.RegisterResponse)
 def register(schema: schemas.UserRegister, db: Session = Depends(get_db)):
-    password = schema.password
-    email = schema.email
-    code = register_user(email=email, password=password, db=db)
-    if code == 0:
-        response = schemas.RegisterResponse(code=code, message='operation success')
-    elif code == 101:
-        response = schemas.RegisterResponse(code=code, message='has been registered')
-    else:
-        response = schemas.RegisterResponse(code=code, message='operation failed')
-    return response
+    """
+    用户注册接口（Controller 层）：
+    - 参数校验由 Pydantic (schemas.UserRegister) 完成
+    - 业务逻辑委托给 user_service
+    """
+    return register_user_service(schema=schema, db=db)
+
 
 @router_user.put('/login', response_model=schemas.LoginResponse)
-def login(form_data: Annotated[schemas.ExtendedOAuth2PasswordRequestForm, Depends()],
-          db: Session = Depends(get_db)):
-    email = form_data.email
-    password = form_data.password
-    code = login_user(email=email, password=password, db=db)
-    if code == 0:
-        user = get_user(email=email, db=db)
-        token = create_access_token(data={"ID": user.id, "email": form_data.email})
-        access_token = token
-        response = schemas.LoginResponse(
-            code=code,
-            message='operation success',
-            data=schemas.Token(token=access_token)
-        )
-    elif code == 101:
-        response = schemas.LoginResponse(
-            code=code,
-            message='operation failed',
-            data=None
-        )
-    else:
-        response = schemas.LoginResponse(
-            code=code,
-            message='wrong password',
-            data=None
-        )
-    return response
+def login(
+    form_data: Annotated[schemas.ExtendedOAuth2PasswordRequestForm, Depends()],
+    db: Session = Depends(get_db),
+):
+    """
+    用户登录接口：
+    - 调用 user_service 完成校验和 token 生成
+    """
+    return login_user_service(form_data=form_data, db=db)
+
 
 @router_user.get('/info', response_model=schemas.InfoResponse)
 def info_get(user: schemas.UserBase = Depends(get_current_user)):
-    if not user:
-        return schemas.InfoResponse(
-            code=101,
-            message="operation failed",
-            data=None
-        )
-    user_data_temp = schemas.UserBase(
-        ID=user.id,
-        email=user.email
-    )
-    return schemas.InfoResponse(
-        code=0,
-        message="operation success",
-        data=user_data_temp
-    )
+    """
+    获取当前用户信息：
+    - user 由依赖 get_current_user 注入
+    """
+    return get_user_info_service(user=user)
+
 
 @router_user.get('/record', response_model=schemas.RecordResponse)
-def record_get(user: schemas.UserBase = Depends(get_current_user), db: Session = Depends(get_db)):
-    if not user:
-        return schemas.RecordResponse(
-            code=101,
-            message="operation failed",
-            data=[]
-        )
-    else:
-        user_record = get_user_record(ID=user.id, db=db)
-        data_temp = []
-        for record in user_record:
-            data_temp.append(schemas.Record(
-                ID=record.id,
-                user_ID=record.user_id,
-                img_src=record.img_src,
-                state=record.state,
-                result=schemas.Result(
-                    tongue_color=record.tongue_color,
-                    coating_color=record.coating_color,
-                    tongue_thickness=record.tongue_thickness,
-                    rot_greasy=record.rot_greasy
-                )
-            ))
-        return schemas.RecordResponse(
-            code=0,
-            message="operation success",
-            data=data_temp
-        )
+def record_get(
+    user: schemas.UserBase = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    获取当前用户的历史舌诊记录。
+    """
+    return get_user_record_service(user=user, db=db)
+

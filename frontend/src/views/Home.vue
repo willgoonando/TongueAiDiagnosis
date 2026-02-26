@@ -12,120 +12,88 @@ onMounted(() => {
 
 <template>
   <div class="back-ground">
-    <div class="bg-decorations">
-      <div class="decoration-circle decoration-1"></div>
-      <div class="decoration-circle decoration-2"></div>
-      <div class="decoration-circle decoration-3"></div>
-      <div class="floating-elements">
-        <div class="floating-element element-1"></div>
-        <div class="floating-element element-2"></div>
-        <div class="floating-element element-3"></div>
-      </div>
-    </div>
-
     <section class="main-section">
-      <div class="container">
-        <el-row :gutter="40">
-          <el-col :xs="24" :lg="14">
-            <div class="hero-content" :class="{ 'loaded': isLoaded }">
-              <div class="hero-badge">
-                <span class="badge-icon">🔬</span>
-                <span>AI-Powered TCM Diagnosis</span>
+      <div class="hero-grid" :class="{ 'loaded': isLoaded }">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge-icon">🔬</span>
+            <span>AI-Powered TCM Diagnosis</span>
+          </div>
+
+          <h1 class="gradient-title">
+            <span class="title-line">Intelligent</span>
+            <span class="title-line highlight">Tongue Diagnosis</span>
+            <span class="title-line">for Everyone</span>
+          </h1>
+
+          <p class="subtitle">
+            Capture your tongue, let AI read subtle TCM tongue features, and receive easy-to-understand health
+            suggestions in seconds.
+          </p>
+
+          <div class="feature-tags">
+            <span class="tag">✨ Deep learning tongue analysis</span>
+            <span class="tag">📷 One-tap photo upload</span>
+            <span class="tag">📜 TCM-style interpretation</span>
+          </div>
+
+          <div class="cta-section">
+            <router-link to="/check" class="cta-button primary">
+              <span class="button-text">Start Tongue Diagnosis</span>
+              <div class="button-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2"/>
+                </svg>
               </div>
+            </router-link>
+          </div>
+        </div>
 
-              <h1 class="gradient-title">
-                <span class="title-line">Intelligent</span>
-                <span class="title-line highlight">Tongue Diagnosis</span>
-                <span class="title-line">Revolution</span>
-              </h1>
-
-              <p class="subtitle">
-                Experience the future of Traditional Chinese Medicine with our cutting-edge AI technology.
-                Get instant, accurate tongue diagnosis and personalized health insights powered by deep learning.
-              </p>
-
-              <div class="feature-tags">
-                <span class="tag">✨ AI-Powered</span>
-                <span class="tag">📱 Instant Results</span>
-                <span class="tag">🏥 TCM Integration</span>
-              </div>
-
-              <div class="cta-section">
-                <router-link to="/check" class="cta-button primary">
-                  <span class="button-text">Start Diagnosis</span>
-                  <div class="button-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                  </div>
-                </router-link>
-              </div>
+        <div class="hero-visual">
+          <div class="tongue-card">
+            <img src="@/assets/Chat_Tongue.jpg" alt="AI Tongue Preview" class="tongue-image">
+            <div class="tongue-overlay">
+              <div class="overlay-chip">舌色 · Tongue Color</div>
+              <div class="overlay-chip">苔色 · Coating</div>
+              <div class="overlay-chip">厚薄 · Thickness</div>
+              <div class="overlay-chip">腻腐 · Greasy/Furred</div>
             </div>
-          </el-col>
-
-          <el-col :xs="24" :lg="10">
-            <div class="card-group" :class="{ 'loaded': isLoaded }">
-              <div class="featured-card">
-                <div class="card-header">
-                  <div class="card-icon featured">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"
-                            fill="currentColor"/>
-                    </svg>
-                  </div>
-                  <div class="card-badge">Featured</div>
-                </div>
-                <h3>AI Tongue Analysis</h3>
-                <p>Advanced deep learning algorithms analyze tongue characteristics with 95%+ accuracy,
-                  providing comprehensive TCM diagnosis in seconds.</p>
-                <div class="card-stats">
-                  <div class="stat">
-                    <span class="stat-value">80%+</span>
-                    <span class="stat-label">Accuracy</span>
-                  </div>
-                  <div class="stat">
-                    <span class="stat-value">&lt;40s</span>
-                    <span class="stat-label">Analysis Time</span>
-                  </div>
-                </div>
-              </div>
-
-              <el-card class="feature-card">
-                <div class="card-content">
-                  <div class="card-icon">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-                      <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                            stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                  </div>
-                  <h3>Health Tracking</h3>
-                  <p>Monitor your health journey with detailed reports, historical comparisons, and personalized recommendations.</p>
-                  <div class="card-features">
-                    <span class="feature-item">📊 Visual Reports</span>
-                    <span class="feature-item">📈 Progress Tracking</span>
-                  </div>
-                </div>
-              </el-card>
-
-              <el-card class="feature-card">
-                <div class="card-content">
-                  <div class="card-icon">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-                      <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88M13 7C13 9.20914 11.2091 11 9 11C6.79086 11 5 9.20914 5 7C5 4.79086 6.79086 3 9 3C11.2091 3 13 4.79086 13 7Z"
-                            stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                  </div>
-                  <h3>Expert Consultation</h3>
-                  <p>Connect with certified TCM practitioners for detailed consultations and treatment recommendations.</p>
-                  <div class="card-features">
-                    <span class="feature-item">👨‍⚕️ Certified Experts</span>
-                    <span class="feature-item">💬 Real-time Chat</span>
-                  </div>
-                </div>
-              </el-card>
+          </div>
+          <div class="hero-metrics">
+            <div class="metric-card">
+              <div class="metric-label">Avg. analysis time</div>
+              <div class="metric-value">&lt; 40 s</div>
             </div>
-          </el-col>
-        </el-row>
+            <div class="metric-card">
+              <div class="metric-label">Tongue feature coverage</div>
+              <div class="metric-value">4+ key signs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="steps-row">
+        <div class="step-card">
+          <div class="step-index">01</div>
+          <div class="step-title">Capture your tongue</div>
+          <div class="step-body">
+            Use natural light, relax your tongue and keep it flat to get a clear, reliable tongue photo.
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-index">02</div>
+          <div class="step-title">AI analyses TCM features</div>
+          <div class="step-body">
+            Our model detects tongue color, coating, thickness and greasy signs based on TCM diagnostic principles.
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-index">03</div>
+          <div class="step-title">Receive your insights</div>
+          <div class="step-body">
+            Get concise explanations and health suggestions in a chat-like interface, ready to discuss with a doctor.
+          </div>
+        </div>
       </div>
     </section>
   </div>
@@ -133,86 +101,15 @@ onMounted(() => {
 
 <style scoped>
 .back-ground {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
-  position: relative;
-  overflow: hidden;
-}
-
-.bg-decorations {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.decoration-circle {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-}
-
-.decoration-1 {
-  width: 300px;
-  height: 300px;
-  top: -150px;
-  right: -150px;
-  animation: float 8s ease-in-out infinite;
-}
-
-.decoration-2 {
-  width: 200px;
-  height: 200px;
-  bottom: -100px;
-  left: -100px;
-  animation: float 6s ease-in-out infinite reverse;
-}
-
-.decoration-3 {
-  width: 150px;
-  height: 150px;
-  top: 50%;
-  right: 10%;
-  animation: float 10s ease-in-out infinite;
-}
-
-.floating-elements {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.floating-element {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  animation: twinkle 3s ease-in-out infinite;
-}
-
-.element-1 {
-  top: 20%;
-  left: 10%;
-  animation-delay: 0s;
-}
-
-.element-2 {
-  top: 60%;
-  right: 20%;
-  animation-delay: 1s;
-}
-
-.element-3 {
-  bottom: 30%;
-  left: 70%;
-  animation-delay: 2s;
+  padding: 96px 24px 32px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background:
+      radial-gradient(circle at top left, #e0f2fe 0, transparent 45%),
+      radial-gradient(circle at bottom right, #ede9fe 0, transparent 50%),
+      #f5f7fb;
 }
 
 .header {
@@ -223,54 +120,68 @@ onMounted(() => {
 .main-section {
   position: relative;
   z-index: 2;
-  padding: 60px 0 100px;
-  min-height: calc(100vh - 91px);
+  padding: 32px 40px 28px;
+  min-height: 0;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 28px;
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.08);
 }
 
 .container {
-  max-width: 1400px;
-  padding: 0 24px;
-  margin: 0 auto;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
 }
 
-.hero-content {
-  padding-right: 20px;
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+  margin-bottom: 32px;
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.hero-content.loaded {
+.hero-grid.loaded {
   opacity: 1;
   transform: translateY(0);
+}
+
+.hero-content {
+  padding-right: 8px;
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 50px;
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(37, 99, 235, 0.06);
+  border-radius: 999px;
+  color: #1d4ed8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
 .badge-icon {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .gradient-title {
-  font-size: 4rem;
+  font-size: 2.9rem;
   line-height: 1.1;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   font-weight: 800;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #0f172a;
 }
 
 .title-line {
@@ -278,7 +189,7 @@ onMounted(() => {
 }
 
 .title-line.highlight {
-  background: linear-gradient(45deg, #ffd89b 0%, #19547b 100%);
+  background: linear-gradient(45deg, #2563eb 0%, #14b8a6 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -286,10 +197,10 @@ onMounted(() => {
 }
 
 .subtitle {
-  color: rgba(255, 255, 255, 0.9);
+  color: #4b5563;
   font-size: 1.25rem;
   line-height: 1.7;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   max-width: 580px;
   font-weight: 400;
 }
@@ -303,13 +214,12 @@ onMounted(() => {
 
 .tag {
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  background: #eff6ff;
   border-radius: 25px;
-  color: white;
+  color: #1d4ed8;
   font-size: 0.875rem;
   font-weight: 500;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
 .cta-section {
@@ -321,11 +231,11 @@ onMounted(() => {
 .cta-button {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 32px;
-  border-radius: 16px;
+  gap: 10px;
+  padding: 14px 26px;
+  border-radius: 999px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -335,16 +245,15 @@ onMounted(() => {
 }
 
 .cta-button.primary {
-  background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(45deg, #2563eb 0%, #22c55e 100%);
   color: white;
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.35);
 }
 
 .cta-button.secondary {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid rgba(148, 163, 184, 0.5);
 }
 
 .cta-button:hover {
@@ -352,11 +261,11 @@ onMounted(() => {
 }
 
 .cta-button.primary:hover {
-  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.45);
 }
 
 .cta-button.secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #f9fafb;
 }
 
 .button-icon {
@@ -370,31 +279,23 @@ onMounted(() => {
 .card-group {
   display: grid;
   gap: 24px;
-  opacity: 0;
-  transform: translateX(30px);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
-}
-
-.card-group.loaded {
-  opacity: 1;
-  transform: translateX(0);
+  align-self: stretch;
 }
 
 .featured-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 28px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
 .featured-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.18);
 }
 
 .card-header {
@@ -407,7 +308,7 @@ onMounted(() => {
 .card-icon.featured {
   width: 60px;
   height: 60px;
-  background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+  background: radial-gradient(circle at 30% 0, #bfdbfe, #2563eb);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -417,30 +318,31 @@ onMounted(() => {
 
 .card-badge {
   padding: 4px 12px;
-  background: linear-gradient(45deg, #ffd89b 0%, #19547b 100%);
-  color: white;
+  background: #ecfdf3;
+  color: #15803d;
   border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
 }
 
 .featured-card h3 {
-  color: #2c3e50;
-  font-size: 1.75rem;
+  color: #0f172a;
+  font-size: 1.6rem;
   margin-bottom: 16px;
   font-weight: 700;
 }
 
 .featured-card p {
-  color: #5a6c7d;
-  line-height: 1.6;
-  font-size: 1rem;
+  color: #4b5563;
+  line-height: 1.65;
+  font-size: 0.98rem;
   margin-bottom: 24px;
 }
 
 .card-stats {
   display: flex;
   gap: 32px;
+  flex-wrap: wrap;
 }
 
 .stat {
@@ -452,28 +354,27 @@ onMounted(() => {
 .stat-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #667eea;
+  color: #2563eb;
   margin-bottom: 4px;
 }
 
 .stat-label {
   font-size: 0.875rem;
-  color: #8b95a1;
+  color: #6b7280;
 }
 
 .feature-card {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #f9fafb;
+  border: 1px solid rgba(226, 232, 240, 0.9);
   border-radius: 20px;
   transition: all 0.3s ease;
   overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
 }
 
 .card-content {
@@ -483,7 +384,7 @@ onMounted(() => {
 .card-icon {
   width: 50px;
   height: 50px;
-  background: linear-gradient(45deg, #667eea20 0%, #764ba220 100%);
+  background: radial-gradient(circle at 30% 0, #e0f2fe, #bfdbfe);
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -493,14 +394,14 @@ onMounted(() => {
 }
 
 .feature-card h3 {
-  color: #2c3e50;
+  color: #111827;
   font-size: 1.5rem;
   margin-bottom: 12px;
   font-weight: 600;
 }
 
 .feature-card p {
-  color: #5a6c7d;
+  color: #4b5563;
   line-height: 1.6;
   font-size: 0.95rem;
   margin-bottom: 20px;
@@ -514,36 +415,133 @@ onMounted(() => {
 
 .feature-item {
   padding: 6px 12px;
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
+  background: #eff6ff;
+  color: #1d4ed8;
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 500;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-20px) rotate(5deg);
-  }
+.hero-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-@keyframes twinkle {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
+.tongue-card {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+  background: radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.18), transparent 55%),
+  #020617;
+}
+
+.tongue-image {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  opacity: 0.96;
+}
+
+.tongue-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-end;
+  gap: 8px;
+  padding: 14px 16px;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.85), transparent 55%);
+}
+
+.overlay-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: #e5e7eb;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.hero-metrics {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.metric-card {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #eff6ff;
+  border: 1px solid rgba(191, 219, 254, 0.9);
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.steps-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.step-card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: #f9fafb;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.step-index {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+.step-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.step-body {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: #6b7280;
 }
 
 @media (max-width: 1024px) {
+  .back-ground {
+    padding: 88px 16px 24px;
+  }
+
+  .main-section {
+    padding: 28px 24px;
+  }
+
+  .hero-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 28px;
+  }
+
   .gradient-title {
-    font-size: 3rem;
+    font-size: 2.4rem;
   }
 
   .hero-content {
@@ -557,12 +555,17 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .main-section {
+    padding: 24px 18px;
+    border-radius: 22px;
+  }
+
   .gradient-title {
-    font-size: 2.5rem;
+    font-size: 2.1rem;
   }
 
   .main-section {
-    padding: 40px 0 60px;
+    padding: 24px 16px 28px;
   }
 
   .cta-section {
@@ -581,11 +584,32 @@ onMounted(() => {
   .card-stats {
     justify-content: space-around;
   }
+
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-visual {
+    order: -1;
+  }
+
+  .steps-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 480px) {
+  .back-ground {
+    padding: 80px 12px 20px;
+  }
+
+  .main-section {
+    padding: 20px 14px;
+    border-radius: 18px;
+  }
+
   .gradient-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
   .subtitle {

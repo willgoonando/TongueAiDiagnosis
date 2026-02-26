@@ -1,3 +1,22 @@
+"""舌象 AI 推理引擎（YOLOv5 + SAM + ResNet）
+
+本模块封装了舌象识别的完整深度学习流程，主要步骤：
+1. 使用 YOLOv5 定位舌头区域（目标检测，得到 bounding box）
+2. 使用 SAM(Segment Anything) 对舌头区域做精细分割，得到舌头掩码
+3. 将分割后的舌头裁剪出来，送入 ResNet 分类器，得到四个特征：
+   - tongue_color：舌色
+   - tongue_coat_color：苔色
+   - thickness：舌体厚薄
+   - rot_and_greasy：腐腻情况
+4. 通过回调函数 fun(...) 将结果写入数据库（由 CRUD 层负责）
+
+设计要点：
+- 使用单例模式，避免在进程内重复加载大模型权重
+- 使用内部 queue + main 循环模拟“推理任务队列”，在 run.py 中以线程启动
+
+业务层不会直接依赖深度学习细节，而是通过 services/tongue_service.py 间接调用。
+"""
+
 import queue
 import tempfile
 import torch

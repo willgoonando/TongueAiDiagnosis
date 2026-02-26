@@ -1,3 +1,13 @@
+"""TongueAnalysis 表相关的底层数据库操作（DAO）
+
+主要负责和舌象分析记录表交互，包括：
+- write_event：在用户上传图片时，插入一条 state 为 0 的初始记录
+- write_result：舌象模型分析完毕后，写入四个特征值与最终状态码
+- get_record_by_location：根据图片路径查询对应的 TongueAnalysis 记录
+
+这些函数由 services/tongue_service.py 和 AI 推理模块调用。
+"""
+
 from sqlalchemy.orm import Session
 from application.models import models
 from ..database import get_db_object

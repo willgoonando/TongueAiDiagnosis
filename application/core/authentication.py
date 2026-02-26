@@ -1,3 +1,14 @@
+"""认证与授权相关工具函数
+
+本模块提供 JWT 相关的核心能力（类似 Java 中的 JwtUtil / SecurityConfig）：
+- create_access_token：根据用户信息生成带过期时间的 JWT
+- get_current_user：从请求头中的 Bearer Token 解出当前登录用户对象
+
+注意：
+- 这里只负责技术层面的“认证”，不包含任何业务逻辑
+- 被 routes/user_api.py、routes/model_api.py 等模块通过 Depends 注入使用
+"""
+
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 from datetime import datetime, timedelta

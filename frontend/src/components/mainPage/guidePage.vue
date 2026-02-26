@@ -140,9 +140,9 @@ defineExpose({handleChatStart, changeGuideText})
 
 .right-prompt {
   position: absolute;
-  left: 2rem;
-  top: 10%;
-  transform: translateY(-50%);
+  left: 50%;
+  top: 24px;
+  transform: translateX(-50%);
   z-index: 101;
 }
 
@@ -154,7 +154,7 @@ defineExpose({handleChatStart, changeGuideText})
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  animation: slideIn 4s ease-out, hover-shake 2s ease-in-out infinite;;
+  animation: slideIn 0.7s ease-out, hover-shake 2s ease-in-out infinite;
 }
 
 @media (max-width: 768px) {
@@ -198,22 +198,22 @@ defineExpose({handleChatStart, changeGuideText})
 
 @keyframes hover-shake {
   0%, 100% {
-    transform: translateY(-50%) translateX(0);
+    transform: translateX(0);
   }
   25% {
-    transform: translateY(-50%) translateX(5px);
+    transform: translateX(5px);
   }
   75% {
-    transform: translateY(-50%) translateX(-5px);
+    transform: translateX(-5px);
   }
 }
 
 @keyframes slideIn {
   from {
-    transform: translateY(-50%) translateX(100%);
+    transform: translateX(100%);
   }
   to {
-    transform: translateY(-50%) translateX(0);
+    transform: translateX(0);
   }
 }
 </style>

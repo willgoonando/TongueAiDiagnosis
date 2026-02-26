@@ -15,7 +15,7 @@ const isScrolled = ref(false)
 const isMobileMenuOpen = ref(false)
 
 const setActiveIndex = () => {
-  activeIndex.value = route.path === '/check' ? '3' : '2'
+  activeIndex.value = (route.path === '/check' || route.path.startsWith('/exam/')) ? '3' : '2'
 }
 
 const fetchUserInfo = async () => {
@@ -45,7 +45,7 @@ const handleSelect = (key) => {
   const routes = {
     1: '/home',
     2: '/home',
-    3: '/check'
+    3: '/exam/coating'
   }
   if (routes[key]) {
     router.push(routes[key])
@@ -66,6 +66,11 @@ const handleScroll = () => {
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+const gotoExam = async (path) => {
+  await router.push(path)
+  isMobileMenuOpen.value = false
 }
 
 onMounted(() => {
@@ -112,19 +117,35 @@ watch(() => route.path, () => {
             </div>
             <span>Home</span>
           </router-link>
-          <router-link
-              to="/check"
-              class="nav-item"
-              :class="{ 'active': activeIndex === '3' }"
-          >
+          <div class="nav-item" :class="{ 'active': activeIndex === '3' }">
             <div class="nav-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
                       stroke="currentColor" stroke-width="2"/>
               </svg>
             </div>
-            <span>Examination</span>
-          </router-link>
+            <el-dropdown trigger="click" popper-class="custom-dropdown">
+              <span class="exam-dropdown-trigger">
+                Examination
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="margin-left: 6px;">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu class="custom-dropdown-menu">
+                  <el-dropdown-item class="menu-item" @click="gotoExam('/exam/coating')">
+                    🧪 舌苔检测
+                  </el-dropdown-item>
+                  <el-dropdown-item class="menu-item" @click="gotoExam('/exam/report')">
+                    📄 报告解读
+                  </el-dropdown-item>
+                  <el-dropdown-item class="menu-item" @click="gotoExam('/exam/drugbox')">
+                    💊 药盒识别
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
       </nav>
       <div class="user-section">
@@ -198,7 +219,7 @@ watch(() => route.path, () => {
           <span>Home</span>
         </router-link>
         <router-link
-            to="/check"
+            to="/exam/coating"
             class="mobile-nav-item"
             :class="{ 'active': activeIndex === '3' }"
             @click="isMobileMenuOpen = false"
@@ -208,6 +229,20 @@ watch(() => route.path, () => {
                   stroke="currentColor" stroke-width="2"/>
           </svg>
           <span>Examination</span>
+        </router-link>
+        <router-link
+            to="/exam/report"
+            class="mobile-nav-item"
+            @click="isMobileMenuOpen = false"
+        >
+          <span>📄 报告解读</span>
+        </router-link>
+        <router-link
+            to="/exam/drugbox"
+            class="mobile-nav-item"
+            @click="isMobileMenuOpen = false"
+        >
+          <span>💊 药盒识别</span>
         </router-link>
         <div v-if="isAuthenticated" class="mobile-user-section">
           <div class="mobile-user-profile">
@@ -342,6 +377,14 @@ watch(() => route.path, () => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+}
+
+.exam-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .nav-item:hover {

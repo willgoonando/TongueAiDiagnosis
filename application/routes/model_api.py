@@ -1,18 +1,34 @@
-import os
-import time
-from fastapi import APIRouter, Depends, UploadFile, Body, Form, File
+"""舌象分析与对话相关的 HTTP 接口（Controller 层）
+
+本模块对应 Java 项目中的 Controller：
+- 提供 /api/model 下的所有接口（在 application/routes/__init__.py 中挂载前缀）
+- 自身不直接处理复杂业务，统一委托给 services 层：
+  - application.services.tongue_service 负责舌象分析流程
+  - application.services.chat_service 负责会话管理与调用 LLM
+
+当前暴露的主要接口：
+- POST /api/model/session         上传舌头图片并启动新的诊断会话（首条 AI 回答）
+- POST /api/model/session/{id}    在已有会话中继续对话
+- GET  /api/model/record/{id}     获取某个会话的历史聊天记录
+- GET  /api/model/session         获取当前用户所有会话 ID 列表
+"""
+
+from fastapi import APIRouter, Depends, UploadFile, Form, File
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from datetime import datetime
-from tempfile import SpooledTemporaryFile
-from .ollama_used import OllamaStreamChatter
 from ..core import get_current_user
 from ..models import schemas
 from ..orm.database import get_db
-from ..orm import write_event, write_result, get_record_by_location, get_chat_record, get_all_chat_id, get_result, create_new_session, create_new_chat_records
-from ..config import Settings
-from ..net.predict import TonguePredictor
 from ..config import settings
+from ..services import (
+    TongueFeatures,
+    analyse_tongue_image,
+    create_session_with_first_message,
+    stream_first_answer,
+    append_user_message_and_stream_answer,
+    get_session_records,
+    get_session_id_list,
+)
 
 router_tongue_analysis = APIRouter()
 
@@ -55,6 +71,27 @@ def format_tongue_features(tongue_color,
         missing_key = int(str(e).split("'")[1])
         return f"错误：检测到无效特征值 {missing_key}，请检查输入范围"
 
+# def format_tongue_features(tongue_color,
+#                            coating_color,
+#                            tongue_thickness,
+#                            rot_greasy):
+#     try:
+#         features = [
+#             f"Color of the tongue: {feature_map['Color of the tongue'][tongue_color]}",
+#             f"Color of the tongue coating: {feature_map['Color of the tongue coating'][coating_color]}",
+#             f"Thickness of the tongue: {feature_map['Thickness of the tongue'][tongue_thickness]}",
+#             f"Decay and putrefaction of the tongue: {feature_map['Decay and putrefaction of the tongue'][rot_greasy]}"
+#         ]
+#         return "，".join(features)
+#     except KeyError as e:
+#         # --- 修复开始 ---
+#         # 直接使用 str(e) 获取错误的键值，不需要 split
+#         return f"错误：检测到无效特征值 {e}，请检查模型输出是否在 feature_map 范围内"
+#         # --- 修复结束 ---
+#     except Exception as e:
+#         # 增加一个通用的错误捕获，防止其他情况崩溃
+#         print(f"特征格式化未知错误: {e}")
+#         return "特征解析失败"
 
 class UserInput(BaseModel):
     input: str
@@ -71,12 +108,13 @@ async def upload(sessionId: int,
             message="can not find user",
             data=None
         )
-    else:
-        bot = OllamaStreamChatter(
-            system_prompt=settings.SYSTEM_PROMPT
-        )
-        create_new_chat_records(db=db, content=user_input.input, session_id=sessionId, role=1)
-        return bot.chat_stream_add(user.id, db, sessionId)
+    # 交给 chat_service 处理追加消息 + 调用 LLM
+    return append_user_message_and_stream_answer(
+        user_id=user.id,
+        session_id=sessionId,
+        user_input=user_input.input,
+        db=db,
+    )
 
 
 class inputPicture(BaseModel):
@@ -98,56 +136,43 @@ async def upload(file_data: UploadFile = File(...),
             data=None
         )
 
-    def analysis(img: SpooledTemporaryFile, record_id: int, function):
-        predictor = TonguePredictor()
-        predictor.predict(img=img, record_id=record_id, fun=function)
+    # 舌象分析统一交给 service
+    features: TongueFeatures = analyse_tongue_image(
+        img_file=file_data,
+        user_id=user.id,
+        db=db,
+    )
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_extension = os.path.splitext(file_data.filename)[1]
-    filename = f"{timestamp}{file_extension}"
-    file_location = f"{Settings.IMG_PATH}/{filename}"
-    with open(file_location, "wb") as f:
-        contents = await file_data.read()
-        f.write(contents)
-    f.close()
-
-    img_db_path = f"{Settings.IMG_DB_PATH}/{filename}"
-    code = write_event(user_id=user.id, img_src=img_db_path, state=0, db=db)
-
-    if code == 0:
-        record = get_record_by_location(img_db_path, db=db)
-        analysis(img=file_data.file, record_id=record.id, function=write_result)
-        while True:
-            result1 = get_result(img_db_path, db=db)
-            if result1.state != 0:
-                break
-            time.sleep(1)
-
-        result = get_result(img_db_path, db=db)
-        if result.state != 1:
-            return schemas.BaseModel(
-                code=result.state,
-                message="图片有问题",
-                data=None
-            )
-        tongue_color = result.tongue_color
-        coating_color = result.coating_color
-        tongue_thickness = result.tongue_thickness
-        rot_greasy = result.rot_greasy
-        feature = format_tongue_features(tongue_color,coating_color,tongue_thickness,rot_greasy)
-        bot = OllamaStreamChatter(
-            system_prompt=settings.SYSTEM_PROMPT
+    if features.code != 0:
+        return schemas.BaseModel(
+            code=features.code,
+            message="图片有问题",
+            data=None,
         )
-        new_message = create_new_session(ID=user.id, db=db, tittle=name)
-        session_new_id = new_message.id
-        create_new_chat_records(db=db, content=user_input, session_id=session_new_id, role=1)
-        return bot.chat_stream_first(user_input, feature, user.id, db, session_new_id)
-    else:
-        return schemas.UploadResponse(
-            code=201,
-            message="operation failed",
-            data=None
-        )
+
+    feature_text = format_tongue_features(
+        features.tongue_color,
+        features.coating_color,
+        features.tongue_thickness,
+        features.rot_greasy,
+    )
+
+    # 创建会话并写入第一条用户消息
+    session_new_id = create_session_with_first_message(
+        user_id=user.id,
+        name=name,
+        first_message=user_input,
+        db=db,
+    )
+
+    # 调用 LLM 流式返回首条回答
+    return stream_first_answer(
+        user_input=user_input,
+        feature_text=feature_text,
+        user_id=user.id,
+        session_id=session_new_id,
+        db=db,
+    )
 
 @router_tongue_analysis.get("/record/{sessionid}", response_model=schemas.ChatSessionRecordsResponse)
 async def get_chat_records_by_session(sessionid: int,
@@ -160,30 +185,7 @@ async def get_chat_records_by_session(sessionid: int,
             message="can not find user",
             data={"records": []}
         )
-    else:
-        chat_record = get_chat_record(ID=user.id, sessionid=sessionid, db=db)
-        if chat_record == 102 or chat_record == 103:
-            return schemas.ChatSessionRecordsResponse(
-                code=chat_record,
-                message="operation failed",
-                data={"records": []}
-            )
-        else:
-            records = []
-            for record in chat_record:
-                records.append(schemas.ChatRecordResponse(
-                    content=record.content,
-                    create_at=record.create_at,
-                    role=record.role
-                ))
-            data_temp = {
-                "records": records
-            }
-            return schemas.ChatSessionRecordsResponse(
-                code=0,
-                message="operation success",
-                data=data_temp,
-            )
+    return get_session_records(user_id=user.id, session_id=sessionid, db=db)
 
 @router_tongue_analysis.get("/session", response_model=schemas.SessionIdResponse)
 async def get_chat_records_id(db: Session = Depends(get_db),
@@ -194,16 +196,4 @@ async def get_chat_records_id(db: Session = Depends(get_db),
             message="can not find user",
             data=[]
         )
-    else:
-        chat_id_records = get_all_chat_id(ID=user.id, db=db)
-        data_temp = []
-        for record in chat_id_records:
-            data_temp.append(schemas.SessionId(
-                session_id=record.id,
-                name=record.tittle
-            ))
-        return schemas.SessionIdResponse(
-            code=0,
-            message="operation success",
-            data=data_temp
-        )
+    return get_session_id_list(user_id=user.id, db=db)

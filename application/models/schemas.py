@@ -1,3 +1,17 @@
+"""Pydantic 数据模型与接口返回结构定义
+
+本模块定义了所有通过 FastAPI 对外暴露的请求/响应模型（类似 Java 中的 DTO/VO）：
+- UserRegister / UserLogin / UserBase 等：用户相关请求体 / 基础信息
+- Result / Record / RecordResponse：舌象分析结果与历史记录返回结构
+- ChatRecordResponse / ChatSessionRecordsResponse：对话记录返回结构
+- SessionId / SessionIdResponse：会话列表返回结构
+- BaseResponse 及其子类：统一的后端响应格式（code、message、data）
+
+这些模型主要用于：
+- routes 层的 request body / response_model
+- service 层在构造返回数据时保持结构一致
+"""
+
 import time
 from pydantic import BaseModel,Field
 from typing import Union, Annotated, Optional

@@ -1,3 +1,14 @@
+"""ORM 实体模型定义
+
+本模块定义了所有与数据库表一一对应的实体类（类似 Java 中的 @Entity）：
+- User：用户表，包含 email、password 等
+- TongueAnalysis：舌象分析记录表，保存图片路径与模型输出的四个特征
+- ChatSession：对话会话表，记录每次诊断会话的基本信息
+- ChatRecord：聊天记录表，保存用户与 AI 的每条对话内容
+
+这些类都会继承自 application.orm.database.Base，由 SQLAlchemy 负责映射到 SQLite 数据库。
+"""
+
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from ..orm.database import Base
