@@ -58,11 +58,11 @@ const validatePassword = (rule: any, value: any, callback: any) => {
 
 const validateEmail = (rule: any, value: any, callback: any) => {
   if (value === '') {
-    callback(new Error('Please enter your email address'));
+    callback(new Error('请输入您的邮箱地址'));
   } else {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(value)) {
-      callback(new Error('Please enter a valid email address'));
+      callback(new Error('请输入有效的邮箱地址'));
     } else {
       callback();
     }
@@ -71,9 +71,9 @@ const validateEmail = (rule: any, value: any, callback: any) => {
 
 const validatecheckPassword = (rule: any, value: any, callback: any) => {
   if (value === '') {
-    callback(new Error('Please re-enter your password.'))
+    callback(new Error('请再次输入密码'))
   } else if (value !== user.Password) {
-    callback(new Error("Passwords do not match"))
+    callback(new Error("两次输入的密码不一致"))
   } else {
     callback()
   }
@@ -99,7 +99,7 @@ const register = (formEl: FormInstance | undefined) => {
       set_Register_post()
       loading.value = true
     } else {
-      fail_message("Please fill in as required.")
+      fail_message("请按要求填写。")
       return false
     }
   })
@@ -125,10 +125,10 @@ const set_Register_post = () => {
         loading.value = false
         if (error === 'ECONNABORTED') {
 
-          fail_message('request timeout')
+          fail_message('请求超时')
         } else {
 
-          fail_message("Encounter an error, please try again")
+          fail_message("遇到错误，请重试")
           console.error(error);
         }
       });
@@ -163,7 +163,7 @@ const analyze_response = (data: any) => {
     if (data.code === 101) {
       fail_message("This account has been registered")
     } else {
-      fail_message("Registration failed, please try again.")
+      fail_message("注册失败，请重试。")
     }
   }
 }

@@ -99,8 +99,8 @@ onMounted(() => {
     console.log("初始化数据", res.data.data)
     items.value = formatData(res.data.data)
     if (items.value.length) {
-      guidePageRef.value.changeGuideText("View Details of the Record")
-    } else guidePageRef.value.changeGuideText(" Add")
+      guidePageRef.value.changeGuideText("查看记录详情")
+    } else guidePageRef.value.changeGuideText("添加")
   }).catch(error => {
     console.log(error);
   })
@@ -125,14 +125,14 @@ const handleKeyDown = (event: KeyboardEvent) => {
     <div class="ai-shell">
       <div class="ai-shell-header">
         <div class="ai-title-block">
-          <div class="ai-title">AI Tongue Diagnosis Lab</div>
+          <div class="ai-title">AI舌诊实验室</div>
           <div class="ai-subtitle">
-            Upload your tongue image and chat with the AI for Traditional Chinese Medicine based insights.
+            上传您的舌象图片，与AI对话获取基于中医理论的健康洞察。
           </div>
         </div>
         <div class="ai-meta">
-          <span class="ai-meta-pill">⚙ Real‑time analysis</span>
-          <span class="ai-meta-pill">🩺 TCM tongue features</span>
+          <span class="ai-meta-pill">⚙ 实时分析</span>
+          <span class="ai-meta-pill">🩺 中医舌象特征</span>
         </div>
       </div>
 
@@ -140,8 +140,8 @@ const handleKeyDown = (event: KeyboardEvent) => {
         <div class="sidebar-container">
           <div class="sidebar-header">
             <div class="sidebar-header-text">
-              <div class="sidebar-title">Diagnosis Sessions</div>
-              <div class="sidebar-subtitle">Manage and review your tongue analysis history.</div>
+              <div class="sidebar-title">诊断会话</div>
+              <div class="sidebar-subtitle">管理和查看您的舌象分析历史记录。</div>
             </div>
             <el-button type="primary" size="small" @click="addItem" @keydown="handleKeyDown">
               New

@@ -54,19 +54,19 @@ async function getRecordData() {
 const resetPage = () => {
   messages.value = [
     {
-      text: "# 👋 Welcome to  **AI Tongue Diagnosis**！\n" +
+      text: "# 👋 欢迎使用 **AI舌诊系统**！\n" +
           "\n" +
-          "📸 **Please first upload your tongue image.**，AI will conduct intelligent analysis based on traditional Chinese medicine theory and provide health advice.\n" +
+          "📸 **请先上传您的舌象图片。** AI将基于中医理论进行智能分析，并提供健康建议。\n" +
           "\n" +
-          "🔍 **How to take a picture of the tongue?**\n" +
-          "1. Shoot in natural light to avoid being too dark or too bright.\n" +
-          "2. Relax your tongue and stretch it out as far as possible. Don't exert any force.\n" +
-          "3. Keep clean to avoid food residue affecting your judgment.\n" +
+          "🔍 **如何拍摄舌象照片？**\n" +
+          "1. 在自然光下拍摄，避免过暗或过亮。\n" +
+          "2. 放松舌头，尽量伸出来，不要用力。\n" +
+          "3. 保持清洁，避免食物残渣影响判断。\n" +
           "\n" +
-          "💡 **Disclaimer**  \n" +
-          "The analysis results provided by this system are for reference only and cannot replace the diagnosis made by a professional doctor. If you have any health issues, please consult a traditional Chinese medicine doctor or a professional medical expert.\n" +
+          "💡 **免责声明**  \n" +
+          "本系统提供的分析结果仅供参考，不能替代专业医生的诊断。如有健康问题，请咨询中医医生或专业医疗专家。\n" +
           "\n" +
-          "➡ **Please upload your tongue image and let's get started!**\n",
+          "➡ **请上传您的舌象图片，让我们开始吧！**\n",
       isUser: false,
       time: new Date().toLocaleString('default', {
         year: 'numeric',
@@ -264,9 +264,9 @@ const getAnswer = async () => {
     }
     messages.value.pop(); // 直接删去最后一个
     if (error.message === "请求超时") {
-      ErrorPop("Request timeout. Please try again.");
+      ErrorPop("请求超时，请重试。");
     } else {
-      ErrorPop("Encounter an error, please try again.");
+      ErrorPop("遇到错误，请重试。");
     }
   }
   saveHistory();
@@ -400,9 +400,9 @@ const getPictureAnswer = async (fileData, sessionName) => {
     }
     messages.value.pop(); // 直接删去最后一个
     if (error.message === "请求超时") {
-      ErrorPop("Request timeout. Please try again.");
+      ErrorPop("请求超时，请重试。");
     } else {
-      ErrorPop("Encounter an error, please try again.");
+      ErrorPop("遇到错误，请重试。");
     }
   }
 };

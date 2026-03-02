@@ -1,4 +1,5 @@
 venv
+AiDiagnosis_env/
 .idea
 frontend/node_modules
 __pycache__
@@ -9,10 +10,12 @@ frontend/public/tongue
 /application/net/weights/tongue_color.pth
 /application/net/weights/unet.pth
 /application/net/weights/yolov5.pt
+/application/net/weights/sam_vit_b_01ec64.pth
 /application/net/weights/
 /node_modules
 AppDatabase.db
 *.db
-*.db
-*.db
-TongueDiagnosis/    
+TongueDiagnosis/
+data/
+checkpoints/
+runs/    

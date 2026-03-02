@@ -24,8 +24,8 @@ defineExpose({handleChatStart, changeGuideText})
                style="height: 20vh;border-radius: 50%;">
         </div>
         <div class="text-content">
-          <h1 class="title">Welcome to embark on your AI tongue diagnosis journey 👋</h1>
-          <p class="subtitle">Click left{{ guideText }}<br>to obtain the analysis of tongue signs in traditional Chinese medicine</p>
+          <h1 class="title">欢迎开始您的AI舌诊之旅 👋</h1>
+          <p class="subtitle">点击左侧{{ guideText }}<br>获取中医舌象分析</p>
         </div>
       </div>
       <div class="decorations">
@@ -37,7 +37,7 @@ defineExpose({handleChatStart, changeGuideText})
     <div v-if="showWelcome" class="right-prompt">
       <div class="prompt-box">
         <i class="fas fa-hand-point-left"></i>
-        <span>Click here to add or view the conversation</span>
+        <span>点击此处添加或查看对话</span>
       </div>
     </div>
 

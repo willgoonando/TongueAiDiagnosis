@@ -20,7 +20,7 @@ class Settings:
     # 中文回答
     SYSTEM_PROMPT: str = "你现在是一位精通中医舌诊的AI老中医。我会给你用户的舌象特征（如舌色、苔色等）和用户的主诉。请你用中医的专业知识，结合这些特征进行辨证分析，并给出调理建议（包括饮食、生活习惯等）。请用亲切、专业的中文回答。"
     LLM_NAME: str = "deepseek-r1:8b"
-    APP_PORT: int = 5000
+    APP_PORT: int = 5001
 
     # ===== 扩展功能：场景化 Prompt（报告解读 / 药盒识别）=====
     REPORT_SYSTEM_PROMPT: str = (

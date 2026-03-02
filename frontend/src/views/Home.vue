@@ -17,29 +17,28 @@ onMounted(() => {
         <div class="hero-content">
           <div class="hero-badge">
             <span class="badge-icon">🔬</span>
-            <span>AI-Powered TCM Diagnosis</span>
+            <span>AI驱动的中医诊断</span>
           </div>
 
           <h1 class="gradient-title">
-            <span class="title-line">Intelligent</span>
-            <span class="title-line highlight">Tongue Diagnosis</span>
-            <span class="title-line">for Everyone</span>
+            <span class="title-line">智能</span>
+            <span class="title-line highlight">舌诊系统</span>
+            <span class="title-line">人人可用</span>
           </h1>
 
           <p class="subtitle">
-            Capture your tongue, let AI read subtle TCM tongue features, and receive easy-to-understand health
-            suggestions in seconds.
+            拍摄您的舌头，让AI识别细微的中医舌象特征，在几秒内获得易于理解的健康建议。
           </p>
 
           <div class="feature-tags">
-            <span class="tag">✨ Deep learning tongue analysis</span>
-            <span class="tag">📷 One-tap photo upload</span>
-            <span class="tag">📜 TCM-style interpretation</span>
+            <span class="tag">✨ 深度学习舌象分析</span>
+            <span class="tag">📷 一键上传照片</span>
+            <span class="tag">📜 中医式解读</span>
           </div>
 
           <div class="cta-section">
             <router-link to="/check" class="cta-button primary">
-              <span class="button-text">Start Tongue Diagnosis</span>
+              <span class="button-text">开始舌诊</span>
               <div class="button-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2"/>
@@ -51,22 +50,22 @@ onMounted(() => {
 
         <div class="hero-visual">
           <div class="tongue-card">
-            <img src="@/assets/Chat_Tongue.jpg" alt="AI Tongue Preview" class="tongue-image">
+            <img src="@/assets/Chat_Tongue.jpg" alt="AI舌象预览" class="tongue-image">
             <div class="tongue-overlay">
-              <div class="overlay-chip">舌色 · Tongue Color</div>
-              <div class="overlay-chip">苔色 · Coating</div>
-              <div class="overlay-chip">厚薄 · Thickness</div>
-              <div class="overlay-chip">腻腐 · Greasy/Furred</div>
+              <div class="overlay-chip">舌色</div>
+              <div class="overlay-chip">苔色</div>
+              <div class="overlay-chip">厚薄</div>
+              <div class="overlay-chip">腻腐</div>
             </div>
           </div>
           <div class="hero-metrics">
             <div class="metric-card">
-              <div class="metric-label">Avg. analysis time</div>
-              <div class="metric-value">&lt; 40 s</div>
+              <div class="metric-label">平均分析时间</div>
+              <div class="metric-value">&lt; 40 秒</div>
             </div>
             <div class="metric-card">
-              <div class="metric-label">Tongue feature coverage</div>
-              <div class="metric-value">4+ key signs</div>
+              <div class="metric-label">舌象特征覆盖</div>
+              <div class="metric-value">4+ 关键指标</div>
             </div>
           </div>
         </div>
@@ -75,23 +74,23 @@ onMounted(() => {
       <div class="steps-row">
         <div class="step-card">
           <div class="step-index">01</div>
-          <div class="step-title">Capture your tongue</div>
+          <div class="step-title">拍摄您的舌头</div>
           <div class="step-body">
-            Use natural light, relax your tongue and keep it flat to get a clear, reliable tongue photo.
+            使用自然光，放松舌头并保持平整，以获得清晰可靠的舌象照片。
           </div>
         </div>
         <div class="step-card">
           <div class="step-index">02</div>
-          <div class="step-title">AI analyses TCM features</div>
+          <div class="step-title">AI分析中医特征</div>
           <div class="step-body">
-            Our model detects tongue color, coating, thickness and greasy signs based on TCM diagnostic principles.
+            我们的模型基于中医诊断原理，检测舌色、苔色、厚薄和腻腐等特征。
           </div>
         </div>
         <div class="step-card">
           <div class="step-index">03</div>
-          <div class="step-title">Receive your insights</div>
+          <div class="step-title">获得您的健康洞察</div>
           <div class="step-body">
-            Get concise explanations and health suggestions in a chat-like interface, ready to discuss with a doctor.
+            在类似聊天的界面中获得简洁的解释和健康建议，随时可与医生讨论。
           </div>
         </div>
       </div>

@@ -49,11 +49,11 @@ const validatePassword = (rule: any, value: any, callback: any) => {
 
 const validateEmail = (rule: any, value: any, callback: any) => {
   if (value === '') {
-    callback(new Error('Please enter your email address'));
+    callback(new Error('请输入您的邮箱地址'));
   } else {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(value)) {
-      callback(new Error('Please enter a valid email address'));
+      callback(new Error('请输入有效的邮箱地址'));
     } else {
       callback();
     }
@@ -78,7 +78,7 @@ const login = (formEl: FormInstance | undefined) => {
       loading.value = true
       set_Login_put()
     } else {
-      fail_message("Please fill in as required.")
+      fail_message("请按要求填写。")
       return false
     }
   })
@@ -112,10 +112,10 @@ const set_Login_put = () => {
         loading.value = false
         if (error === 'ECONNABORTED') {
           loading.value = false
-          fail_message('request timeout')
+          fail_message('请求超时')
         } else {
           loading.value = false
-          fail_message("Encounter an error, please try again")
+          fail_message("遇到错误，请重试")
           console.error(error);
         }
       });
