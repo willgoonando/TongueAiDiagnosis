@@ -70,3 +70,19 @@ def record_get(
     """
     return get_user_record_service(user=user, db=db)
 
+
+@router_user.get('/get-token')
+def get_token(user: schemas.UserBase = Depends(get_current_user)):
+    """
+    获取当前用户的 token（兼容旧版前端）
+    注意：这个接口主要用于兼容，实际应该使用 /api/user/info 获取用户信息
+    """
+    from ..core.authentication import create_access_token
+    token = create_access_token(data={"sub": user.email})
+    return {
+        "code": 0,
+        "message": "success",
+        "data": {
+            "token": token
+        }
+    }

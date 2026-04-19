@@ -22,7 +22,7 @@ from typing import List
 class BaseResponse(BaseModel):
     code: int
     message: str
-    data: Union[dict, list] = None
+    data: Optional[Union[dict, list]] = None
 
 
 class Token(BaseModel):

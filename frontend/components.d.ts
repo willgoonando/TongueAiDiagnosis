@@ -7,7 +7,11 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    ChatInput: typeof import('./src/components/chat/ChatInput.vue')['default']
+    ChatMain: typeof import('./src/components/chat/ChatMain.vue')['default']
+    ChatSidebar: typeof import('./src/components/chat/ChatSidebar.vue')['default']
     DialogBox: typeof import('./src/components/mainPage/dialogBox.vue')['default']
+    ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElDropdown: typeof import('element-plus/es')['ElDropdown']
@@ -17,6 +21,9 @@ declare module 'vue' {
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
+    ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
+    ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
+    ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     GuidePage: typeof import('./src/components/mainPage/guidePage.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
@@ -28,6 +35,7 @@ declare module 'vue' {
     Loginblock: typeof import('./src/components/Loginblock.vue')['default']
     Main: typeof import('./src/components/mainPage/main.vue')['default']
     MainContainer: typeof import('./src/components/mainPage/mainContainer.vue')['default']
+    NewLogin: typeof import('./src/components/auth/NewLogin.vue')['default']
     Register_Login: typeof import('./src/components/Register_Login.vue')['default']
     Registerblock: typeof import('./src/components/Registerblock.vue')['default']
     Result: typeof import('./src/components/Result.vue')['default']
@@ -36,6 +44,7 @@ declare module 'vue' {
     Steps: typeof import('./src/components/Steps.vue')['default']
     UploadPicture: typeof import('./src/components/UploadPicture.vue')['default']
     WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
+    WelcomeSection: typeof import('./src/components/chat/WelcomeSection.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

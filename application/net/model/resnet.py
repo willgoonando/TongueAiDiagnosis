@@ -4,23 +4,19 @@ from torchvision import transforms
 
 
 class BottleNeckDeep(nn.Module):
-
     def __init__(self, in_channels: int, out_channels: int, stride: int = 1, momentum: int = 0.1,
                  if_downsample: int = False, se_block=None):
         super().__init__()
         self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=1, stride=1, bias=False)
         self.bn1 = nn.BatchNorm2d(num_features=out_channels, momentum=momentum)
-        self.conv2 = nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=3, stride=stride,
-                               padding=1, bias=False)
+        self.conv2 = nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(num_features=out_channels, momentum=momentum)
-        self.conv3 = nn.Conv2d(in_channels=out_channels, out_channels=out_channels * 4, kernel_size=1, stride=1,
-                               bias=False)
+        self.conv3 = nn.Conv2d(in_channels=out_channels, out_channels=out_channels * 4, kernel_size=1, stride=1, bias=False)
         self.bn3 = nn.BatchNorm2d(num_features=out_channels * 4, momentum=momentum)
 
         if if_downsample:
             self.downsample = nn.Sequential(
-                nn.Conv2d(in_channels=in_channels, out_channels=out_channels * 4, kernel_size=1, stride=stride,
-                          bias=False),
+                nn.Conv2d(in_channels=in_channels, out_channels=out_channels * 4, kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(num_features=out_channels * 4)
             )
         else:
@@ -49,21 +45,19 @@ class BottleNeckDeep(nn.Module):
 
 
 class ResNetDeep(nn.Module):
-
     def __init__(self, block_num: list, num_classes=2, se_block=None):
         super().__init__()
-
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(num_features=64, momentum=0.1)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(in_channels=64, out_channels=64, blocks=block_num[0], stride=1,
-                                       se_block=se_block)
-        self.layer2 = self._make_layer(in_channels=256, out_channels=128, blocks=block_num[1], stride=2,
-                                       se_block=se_block)
-        self.layer3 = self._make_layer(in_channels=512, out_channels=256, blocks=block_num[1], stride=2,
-                                       se_block=se_block)
-        self.layer4 = self._make_layer(in_channels=1024, out_channels=512, blocks=block_num[1], stride=2,
-                                       se_block=se_block)
+        
+        # ====================== 你原来的老结构（能兼容你现有模型） ======================
+        self.layer1 = self._make_layer(in_channels=64, out_channels=64, blocks=block_num[0], stride=1, se_block=se_block)
+        self.layer2 = self._make_layer(in_channels=256, out_channels=128, blocks=block_num[1], stride=2, se_block=se_block)
+        self.layer3 = self._make_layer(in_channels=512, out_channels=256, blocks=block_num[1], stride=2, se_block=se_block)
+        self.layer4 = self._make_layer(in_channels=1024, out_channels=512, blocks=block_num[1], stride=2, se_block=se_block)
+        # ================================================================================
+        
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(2048, num_classes)
 
@@ -79,22 +73,18 @@ class ResNetDeep(nn.Module):
         x = self.bn1(x)
         x = torch.relu(x)
         x = self.maxpool(x)
-
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
-
         x = self.avgpool(x)
         x = x.flatten(1)
         x = self.fc(x)
-
         return x
 
 
 class SeNet(nn.Module):
     def __init__(self, in_channels: int, r: int = 16):
-
         super().__init__()
         self.AvagePool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc1 = nn.Linear(in_channels, in_channels // r)
@@ -108,6 +98,7 @@ class SeNet(nn.Module):
         y = y.view(y.size(0), y.size(1), 1, 1)
         return x * y
 
+
 def ResNet50(num_classes=2, if_se=False):
     if if_se:
         return ResNetDeep(block_num=[3, 4, 6, 3], num_classes=num_classes, se_block=SeNet)
@@ -115,21 +106,25 @@ def ResNet50(num_classes=2, if_se=False):
 
 
 class ResNetPredictor:
-    def __init__(self, path: list, tasks: list = [5, 3, 2, 2]):
-        self.device = 'cpu'
+    def __init__(self, path: list, tasks: list = [5, 3, 2, 2], device=None):
+        if device is None:
+            self.device = torch.device("cpu")
+        else:
+            self.device = device if isinstance(device, torch.device) else torch.device(device)
         self.nets = []
         self.transform = transforms.Compose(
             [transforms.ToTensor(), transforms.Normalize(mean=[0.29, 0.22, 0.23], std=[0.34, 0.27, 0.28])])
+        
         for p in range(len(path)):
             net = ResNet50(tasks[p], True).to(self.device)
-            net.load_state_dict(torch.load(path[p], map_location=self.device))
+            checkpoint = torch.load(path[p], map_location=str(self.device))
+            net.load_state_dict(checkpoint['model_state_dict'])
             net.eval()
             self.nets.append(net)
 
     def predict(self, img):
         img = self.transform(img)
         img = img.unsqueeze(0).to(self.device)
-
         result = []
         for net in self.nets:
             with torch.no_grad():

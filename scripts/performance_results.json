@@ -1,0 +1,27 @@
+{
+  "generated_at_utc": "2026-03-29T07:22:37.990397+00:00",
+  "cwd": "D:\\TD",
+  "device_note": "TORCH_DEVICE 见 application/config/config.py",
+  "cv_yolo_sam_resnet": {
+    "times_s": [
+      11.054650100064464,
+      10.351204400067218,
+      10.196155400015414,
+      10.105928399949335,
+      10.284886299981736
+    ],
+    "avg_s": 10.398564920015634,
+    "max_s": 11.054650100064464,
+    "min_s": 10.105928399949335,
+    "runs": 5
+  },
+  "ollama_llm": {
+    "runs": 5,
+    "first_token_avg_s": 3.5348875400144606,
+    "first_token_max_s": 8.483977199997753,
+    "total_avg_s": 4.476596159976907,
+    "total_max_s": 9.513718699919991,
+    "model": "deepseek-r1:8b",
+    "url": "http://localhost:11434/api/chat"
+  }
+}

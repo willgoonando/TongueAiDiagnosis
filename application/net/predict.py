@@ -25,6 +25,17 @@ import numpy as np
 from yolov5 import load
 from segment_anything import sam_model_registry,SamPredictor
 from application.net.model.resnet import ResNetPredictor
+from application.config import settings
+
+
+def _resolve_torch_device():
+    mode = getattr(settings, "TORCH_DEVICE", "auto")
+    if mode == "cpu":
+        return torch.device("cpu")
+    if mode == "cuda":
+        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # auto
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class TonguePredictor:
@@ -48,10 +59,14 @@ class TonguePredictor:
                  ):
         if self._initialized:
             return
-        self.device = torch.device('cpu')
-        self.yolo = load(yolo_path, device='cpu')
+        self.device = _resolve_torch_device()
+        yolo_dev = "cuda:0" if self.device.type == "cuda" else "cpu"
+        self.yolo = load(yolo_path, device=yolo_dev)
         self.sam = sam_model_registry["vit_b"](checkpoint=sam_path)
-        self.resnet = ResNetPredictor(resnet_path)
+        self.sam.to(self.device)
+        # 优化：在初始化时创建SAM Predictor，避免每次推理都创建新实例
+        self.sam_predictor = SamPredictor(sam_model=self.sam)
+        self.resnet = ResNetPredictor(resnet_path, device=self.device)
         self.queue = queue.Queue()
         TonguePredictor._initialized = True
 
@@ -60,8 +75,21 @@ class TonguePredictor:
         self.yolo.eval()
         print("Tongue positioning")
         with torch.no_grad():
+            # YOLOv5 AutoShape 不支持直接传递 conf 参数，先调用模型
             pred = self.yolo(predict_img)
-        if len(pred.xyxy[0]) < 1:
+        
+        # 获取检测结果，格式: [x1, y1, x2, y2, conf, class]
+        detections = pred.xyxy[0]
+        
+        # 设置置信度阈值，过滤低置信度检测
+        conf_threshold = 0.5
+        if len(detections) > 0:
+            # 过滤低置信度检测
+            confidences = detections[:, 4]
+            valid_mask = confidences >= conf_threshold
+            detections = detections[valid_mask]
+        
+        if len(detections) < 1:
             fun(event_id=record_id,
                 tongue_color=None,
                 coating_color=None,
@@ -70,27 +98,41 @@ class TonguePredictor:
                 code=201)
             print("The picture is not legal and has no tongue.")
             return
-        elif len(pred.xyxy[0]) > 1:
-            fun(event_id=record_id,
-                tongue_color=None,
-                coating_color=None,
-                tongue_thickness=None,
-                rot_greasy=None,
-                code=202)
-            print("The picture is not legal. There are too many tongues.")
-            return
+        elif len(detections) > 1:
+            # 如果检测到多个框，选择置信度最高的
+            confidences = detections[:, 4]  # 获取所有检测的置信度
+            best_idx = confidences.argmax().item()  # 找到置信度最高的索引
+            print(f"Detected {len(detections)} tongues, using the one with highest confidence: {confidences[best_idx]:.3f}")
+            # 使用置信度最高的检测结果
+            best_detection = detections[best_idx]
+            x1, y1, x2, y2 = best_detection[0].item(), best_detection[1].item(), best_detection[2].item(), best_detection[3].item()
+        else:
+            # 只有一个检测结果，直接使用
+            x1, y1, x2, y2 = detections[0][0].item(), detections[0][1].item(), detections[0][2].item(), detections[0][3].item()
         print("Tongue segmentation")
         with torch.no_grad():
-            x1, y1, x2, y2 = (
-                pred.xyxy[0][0, 0].item(), pred.xyxy[0][0, 1].item(), pred.xyxy[0][0, 2].item(),
-                pred.xyxy[0][0, 3].item())
-            predictor = SamPredictor(sam_model=self.sam)
-            predictor.set_image(np.array(predict_img))
-            masks, _, _ = predictor.predict(box=np.array([x1, y1, x2, y2]))
+            # 优化：复用已创建的SAM Predictor，避免每次创建新实例
+            self.sam_predictor.set_image(np.array(predict_img))
+            # SAM 返回多个掩码，选择得分最高的
+            masks, scores, logits = self.sam_predictor.predict(box=np.array([x1, y1, x2, y2]))
+            best_mask_idx = np.argmax(scores)
+            best_mask = masks[best_mask_idx]  # 形状: (H, W)
+            
             original_img = np.array(predict_img)
-            masks = np.transpose(masks, (1,2,0))
-            pred = original_img * masks
-            result = Image.fromarray(pred).crop((x1, y1, x2, y2)).convert("RGB")
+            # 应用掩码：非掩码区域设为黑色背景
+            masked_img = original_img.copy()
+            masked_img[~best_mask] = [0, 0, 0]
+            
+            # 使用掩码的精确边界框（比 YOLOv5 边界框更精确）
+            mask_coords = np.where(best_mask)
+            if len(mask_coords[0]) > 0:
+                min_y, max_y = mask_coords[0].min(), mask_coords[0].max()
+                min_x, max_x = mask_coords[1].min(), mask_coords[1].max()
+                # 使用掩码边界框裁剪（更精确，去除更多背景）
+                result = Image.fromarray(masked_img).crop((min_x, min_y, max_x, max_y)).convert("RGB")
+            else:
+                # 回退到 YOLOv5 边界框
+                result = Image.fromarray(masked_img).crop((x1, y1, x2, y2)).convert("RGB")
             result = np.array(result)
         result = self.resnet.predict(result)
         print("Tongue analysis")
@@ -123,18 +165,22 @@ class TonguePredictor:
 
     def main(self):
         while True:
-            if self.queue.empty():
-                continue
-            img, record_id, fun = self.queue.get()
             try:
-                self.__predict(img, record_id, fun)
-            except Exception as e:
-                print(e)
-                fun(event_id=record_id,
-                    tongue_color=None,
-                    coating_color=None,
-                    tongue_thickness=None,
-                    rot_greasy=None,
-                    code=203)
-            finally:
-                img.close()
+                # 优化：使用queue.get(timeout=0.1)替代空检查，避免CPU空转
+                # 如果队列为空，会等待0.1秒后抛出Empty异常，然后继续循环
+                img, record_id, fun = self.queue.get(timeout=0.1)
+                try:
+                    self.__predict(img, record_id, fun)
+                except Exception as e:
+                    print(e)
+                    fun(event_id=record_id,
+                        tongue_color=None,
+                        coating_color=None,
+                        tongue_thickness=None,
+                        rot_greasy=None,
+                        code=203)
+                finally:
+                    img.close()
+            except queue.Empty:
+                # 队列为空时继续循环，不占用CPU
+                continue

@@ -17,10 +17,33 @@ class Settings:
     IMG_DB_PATH: str = "tongue"
     OLLAMA_PATH: str = "http://localhost:11434/api/chat"
     #SYSTEM_PROMPT: str = "You are now an AI traditional Chinese medicine doctor specializing in tongue diagnosis. At the very beginning, I will show you four image features of the user's tongue. Please use your knowledge of traditional Chinese medicine to give the user some suggestions. Answer in English"
-    # 中文回答
-    SYSTEM_PROMPT: str = "你现在是一位精通中医舌诊的AI老中医。我会给你用户的舌象特征（如舌色、苔色等）和用户的主诉。请你用中医的专业知识，结合这些特征进行辨证分析，并给出调理建议（包括饮食、生活习惯等）。请用亲切、专业的中文回答。"
+    # 中文回答 - 明确说明这是基于AI模型分析得到的特征
+    SYSTEM_PROMPT: str = (
+        "你现在是一位精通中医舌诊的AI老中医。"
+        "用户上传了舌象图片，我已经通过AI模型（YOLOv5+SAM+ResNet）自动分析并识别出了舌象特征，包括：舌色、苔色、舌体厚薄、腐腻情况等。"
+        "我会将这些AI分析得到的特征提供给你，同时还有用户的主诉。"
+        "请你基于这些特征，运用中医舌诊的专业知识进行辨证分析，并给出个性化的调理建议（包括饮食、生活习惯、注意事项等）。"
+        "请用亲切、专业的中文回答，不要提及'看不到图片'或'无法查看图片'，因为特征已经通过AI模型准确识别出来了。"
+    )
     LLM_NAME: str = "deepseek-r1:8b"
-    APP_PORT: int = 5001
+    APP_PORT: int = 5000
+
+    # Ollama 推理模型（如 deepseek-r1）默认会把长链推理放在 message.thinking，
+    # message.content 在推理结束前几近为空；本系统前端只拼接 content 时会一直显示“加载中”。
+    # False：请求 Ollama 尽量直接生成正文（需较新版本 Ollama；若无效可改 True 并依赖下方转发 thinking）。
+    OLLAMA_THINK: bool = False
+    # 若本机 Ollama 版本过旧、不识别 think 字段并报错，可改为 False 以从请求体中省略该字段
+    OLLAMA_SEND_THINK_FIELD: bool = True
+    # 限制单次回复最大生成 token，略短可加快结束；None 表示不限制（不传 options）
+    OLLAMA_NUM_PREDICT: int | None = 1200
+
+    # 舌象推理设备：默认 cpu 与旧版一致；改为 auto 可在有 CUDA 时加速 YOLO/SAM/ResNet，
+    # 若与 Ollama 共用同一块 GPU 且显存较小（如 4GB），可能出现 OOM，此时保持 cpu 或让 Ollama 用 CPU。
+    TORCH_DEVICE: str = "cpu"  # auto | cuda | cpu
+
+    # EasyOCR：模型应位于用户目录 .EasyOCR/model（请运行「下载EasyOCR模型.bat」）。
+    # False 表示运行中绝不联网下载（推荐）；若改 True，无代理时可能再次超时。
+    EASYOCR_DOWNLOAD_ENABLED: bool = False
 
     # ===== 扩展功能：场景化 Prompt（报告解读 / 药盒识别）=====
     REPORT_SYSTEM_PROMPT: str = (

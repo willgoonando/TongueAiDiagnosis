@@ -92,12 +92,12 @@ def analyse_tongue_image(img_file: UploadFile, user_id: int, db: Session) -> Ton
     # 这里直接复用 UploadFile 内部的 file 对象
     _analysis(img=img_file.file, record_id=record.id)
 
-    # 3. 轮询等待结果
+    # 3. 轮询等待结果（优化：减少轮询间隔到0.1秒，提升响应速度）
     while True:
         result_obj = get_result(img_db_path, db=db)
         if result_obj.state != 0:
             break
-        time.sleep(1)
+        time.sleep(0.1)  # 从1秒改为0.1秒，减少等待时间
 
     result_obj = get_result(img_db_path, db=db)
 

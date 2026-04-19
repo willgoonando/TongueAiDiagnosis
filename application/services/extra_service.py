@@ -17,11 +17,12 @@ from typing import Optional
 
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
 
 from application.config import settings
 from application.orm import create_new_session, create_new_chat_records
 from application.routes.ollama_used import OllamaStreamChatter
-from application.services.ocr_service import ocr_image_bytes
+from application.services.ocr_service import ocr_image_bytes, OcrUnavailableError
 
 
 @dataclass
@@ -70,7 +71,13 @@ def explain_report_image(db: Session, user_id: int, image_file: UploadFile, ques
     报告解读：图片输入 -> OCR -> LLM。
     """
     image_bytes = image_file.file.read()
-    ocr_text = ocr_image_bytes(image_bytes)
+    try:
+        ocr_text = ocr_image_bytes(image_bytes)
+    except OcrUnavailableError as e:
+        return JSONResponse(
+            status_code=503,
+            content={"code": 503, "message": str(e), "data": None},
+        )
 
     user_content = f"以下是报告OCR文本：\n{ocr_text}\n"
     if question.strip():
@@ -93,7 +100,13 @@ def explain_drugbox_image(db: Session, user_id: int, image_file: UploadFile, que
     药盒识别：图片输入 -> OCR -> LLM。
     """
     image_bytes = image_file.file.read()
-    ocr_text = ocr_image_bytes(image_bytes)
+    try:
+        ocr_text = ocr_image_bytes(image_bytes)
+    except OcrUnavailableError as e:
+        return JSONResponse(
+            status_code=503,
+            content={"code": 503, "message": str(e), "data": None},
+        )
 
     user_content = f"以下是药盒/说明书OCR文本：\n{ocr_text}\n"
     if question.strip():

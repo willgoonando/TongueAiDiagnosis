@@ -17,6 +17,32 @@ from ..orm import create_new_chat_records, get_chat_record
 from ..config import settings
 
 
+def _build_ollama_payload(model: str, messages: list, stream: bool = True) -> dict:
+    """组装 Ollama /api/chat 请求体（think、options 与配置一致）。"""
+    data: dict = {
+        "model": model,
+        "messages": messages,
+        "stream": stream,
+    }
+    if getattr(settings, "OLLAMA_SEND_THINK_FIELD", True):
+        data["think"] = settings.OLLAMA_THINK
+    if settings.OLLAMA_NUM_PREDICT is not None:
+        data["options"] = {"num_predict": settings.OLLAMA_NUM_PREDICT}
+    return data
+
+
+def _stream_parts_from_chunk(chunk: dict):
+    """从 Ollama 流式 JSON 中取出应推给前端的文本增量（content + thinking）。"""
+    msg = chunk.get("message") or {}
+    # 推理模型常见：先流式输出 thinking，再输出 content；两者都转发，前端才能立刻有字
+    thinking = msg.get("thinking")
+    if thinking:
+        yield thinking
+    content = msg.get("content")
+    if content:
+        yield content
+
+
 class OllamaStreamChatter:
     def __init__(self, model=settings.LLM_NAME,
                  system_prompt=None
@@ -34,36 +60,40 @@ class OllamaStreamChatter:
 
     def chat_stream_first(self, user_input, feature, id, db, session_new_id):
         self.messages = []
-        self.messages.append({"role": "user", "content": "The characteristics of the tongue are" + feature + "," + user_input + ". Answer in English"})
-        data = {
-            "model": self.model,
-            "messages": self.messages,
-            "stream": True
-        }
+        # 构建用户消息：说明这是基于AI模型分析得到的舌象特征
+        user_message = (
+            f"我已经通过AI模型分析了用户上传的舌象图片，识别出以下特征：{feature}。"
+            f"用户的主诉是：{user_input}。"
+            f"请基于这些AI分析得到的舌象特征，结合中医舌诊知识，给出专业的辨证分析和调理建议。"
+            f"请用中文回答，语气要亲切专业。"
+        )
+        self.messages.append({"role": "user", "content": user_message})
+        data = _build_ollama_payload(self.model, self.messages, stream=True)
         try:
             response = requests.post(
                 self.url,
                 headers=self.headers,
                 json=data,
-                stream=True
+                stream=True,
+                timeout=(30, 600),
             )
             response.raise_for_status()
 
             def generate():
                 full_response = ""
-                for line in response.iter_lines():
+                for line in response.iter_lines(decode_unicode=False):
                     if line:
-                        chunk = json.loads(line.decode('utf-8'))
-                        if 'message' in chunk:
-                            content = chunk['message']['content']
-                            full_response += content
-                            yield json.dumps({
-                                "token": content,
-                                "session_id": session_new_id,
-                                "is_complete": False
-                            }) + "\n"
+                        chunk = json.loads(line.decode("utf-8"))
+                        if "message" in chunk:
+                            for part in _stream_parts_from_chunk(chunk):
+                                full_response += part
+                                yield json.dumps({
+                                    "token": part,
+                                    "session_id": session_new_id,
+                                    "is_complete": False
+                                }) + "\n"
                 yield json.dumps({
-                    "token": full_response,
+                    "token": "",
                     "session_id": session_new_id,
                     "is_complete": True
                 }) + "\n"
@@ -85,30 +115,32 @@ class OllamaStreamChatter:
             role = "user" if record.role == 1 else "assistant"
             records.append({"role": role, "content": record.content})
         self.messages = records
-        data = {
-            "model": self.model,
-            "messages": self.messages,
-            "stream": True
-        }
+        data = _build_ollama_payload(self.model, self.messages, stream=True)
         try:
-            response = requests.post(self.url, headers=self.headers, json=data, stream=True)
+            response = requests.post(
+                self.url,
+                headers=self.headers,
+                json=data,
+                stream=True,
+                timeout=(30, 600),
+            )
             response.raise_for_status()
 
             def generate():
                 full_response = ""
-                for line in response.iter_lines():
+                for line in response.iter_lines(decode_unicode=False):
                     if line:
-                        chunk = json.loads(line.decode('utf-8'))
-                        if 'message' in chunk:
-                            content = chunk['message']['content']
-                            full_response += content
-                            yield json.dumps({
-                                "token": content,
-                                "session_id": session_id,
-                                "is_complete": False
-                            }) + "\n"
+                        chunk = json.loads(line.decode("utf-8"))
+                        if "message" in chunk:
+                            for part in _stream_parts_from_chunk(chunk):
+                                full_response += part
+                                yield json.dumps({
+                                    "token": part,
+                                    "session_id": session_id,
+                                    "is_complete": False
+                                }) + "\n"
                 yield json.dumps({
-                    "token": full_response,
+                    "token": "",
                     "session_id": session_id,
                     "is_complete": True
                 }) + "\n"
@@ -130,30 +162,32 @@ class OllamaStreamChatter:
         - 返回 NDJSON 流式 token，并在结束后把完整回答异步写入 ChatRecord(role=2)
         """
         self.messages = messages
-        data = {
-            "model": self.model,
-            "messages": self.messages,
-            "stream": True
-        }
+        data = _build_ollama_payload(self.model, self.messages, stream=True)
         try:
-            response = requests.post(self.url, headers=self.headers, json=data, stream=True)
+            response = requests.post(
+                self.url,
+                headers=self.headers,
+                json=data,
+                stream=True,
+                timeout=(30, 600),
+            )
             response.raise_for_status()
 
             def generate():
                 full_response = ""
-                for line in response.iter_lines():
+                for line in response.iter_lines(decode_unicode=False):
                     if line:
-                        chunk = json.loads(line.decode('utf-8'))
-                        if 'message' in chunk:
-                            content = chunk['message']['content']
-                            full_response += content
-                            yield json.dumps({
-                                "token": content,
-                                "session_id": session_id,
-                                "is_complete": False
-                            }) + "\n"
+                        chunk = json.loads(line.decode("utf-8"))
+                        if "message" in chunk:
+                            for part in _stream_parts_from_chunk(chunk):
+                                full_response += part
+                                yield json.dumps({
+                                    "token": part,
+                                    "session_id": session_id,
+                                    "is_complete": False
+                                }) + "\n"
                 yield json.dumps({
-                    "token": full_response,
+                    "token": "",
                     "session_id": session_id,
                     "is_complete": True
                 }) + "\n"

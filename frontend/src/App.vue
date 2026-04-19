@@ -1,11 +1,19 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
+import { computed } from 'vue'
 import Header from '@/components/Header.vue'
+
+const route = useRoute()
+
+// 在聊天页面不显示Header
+const showHeader = computed(() => {
+  return route.name !== 'chat'
+})
 </script>
 <template>
   <div class="app-container">
-    <Header></Header>
-    <main class="main-content">
+    <Header v-if="showHeader"></Header>
+    <main class="main-content" :class="{ 'no-header': !showHeader }">
       <router-view></router-view>
     </main>
   </div>
@@ -37,7 +45,16 @@ body {
   z-index: 1;
 }
 
+.main-content.no-header {
+  padding-top: 0;
+}
+
 .main-content > * {
   min-height: calc(100vh - 72px);
+}
+
+.main-content.no-header > * {
+  min-height: 100vh;
+  height: 100vh;
 }
 </style>

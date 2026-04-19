@@ -15,13 +15,17 @@ const isScrolled = ref(false)
 const isMobileMenuOpen = ref(false)
 
 const setActiveIndex = () => {
-  activeIndex.value = (route.path === '/check' || route.path.startsWith('/exam/')) ? '3' : '2'
+  activeIndex.value = route.path === '/' ? '2' : '1'
 }
 
 const fetchUserInfo = async () => {
   const token = localStorage.getItem('token')
   if (!token) {
-    await router.push('/register')
+    isAuthenticated.value = false
+    // 只在当前不在注册页时才跳转
+    if (route.path !== '/register' && route.path !== '/login') {
+      await router.push('/register')
+    }
     return
   }
   try {
@@ -36,16 +40,20 @@ const fetchUserInfo = async () => {
     }
   } catch (error) {
     console.error('authentication failure:', error)
+    isAuthenticated.value = false
     localStorage.removeItem('token')
-    await router.push('/register')
+    // 只在当前不在注册页时才跳转
+    if (route.path !== '/register' && route.path !== '/login') {
+      await router.push('/register')
+    }
   }
 }
 
 const handleSelect = (key) => {
   const routes = {
-    1: '/home',
-    2: '/home',
-    3: '/exam/coating'
+    1: '/',
+    2: '/',
+    3: '/'
   }
   if (routes[key]) {
     router.push(routes[key])
@@ -69,7 +77,8 @@ const toggleMobileMenu = () => {
 }
 
 const gotoExam = async (path) => {
-  await router.push(path)
+  // 所有功能已集成到新的聊天界面
+  await router.push('/')
   isMobileMenuOpen.value = false
 }
 
@@ -79,10 +88,18 @@ onMounted(() => {
   window.addEventListener('scroll', handleScroll)
 })
 
+// 添加防抖，避免频繁请求
+let fetchUserInfoTimer = null
 watch(() => route.path, () => {
   setActiveIndex()
   isMobileMenuOpen.value = false
-  fetchUserInfo()
+  // 防抖：500ms 内只执行一次
+  if (fetchUserInfoTimer) {
+    clearTimeout(fetchUserInfoTimer)
+  }
+  fetchUserInfoTimer = setTimeout(() => {
+    fetchUserInfo()
+  }, 500)
 })
 </script>
 
@@ -104,7 +121,7 @@ watch(() => route.path, () => {
       <nav class="desktop-nav">
         <div class="nav-items">
           <router-link
-              to="/home"
+              to="/"
               class="nav-item"
               :class="{ 'active': activeIndex === '2' }"
           >
@@ -133,13 +150,13 @@ watch(() => route.path, () => {
               </span>
               <template #dropdown>
                 <el-dropdown-menu class="custom-dropdown-menu">
-                  <el-dropdown-item class="menu-item" @click="gotoExam('/exam/coating')">
+                  <el-dropdown-item class="menu-item" @click="gotoExam('/')">
                     🧪 舌苔检测
                   </el-dropdown-item>
-                  <el-dropdown-item class="menu-item" @click="gotoExam('/exam/report')">
+                  <el-dropdown-item class="menu-item" @click="gotoExam('/')">
                     📄 报告解读
                   </el-dropdown-item>
-                  <el-dropdown-item class="menu-item" @click="gotoExam('/exam/drugbox')">
+                  <el-dropdown-item class="menu-item" @click="gotoExam('/')">
                     💊 药盒识别
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -206,7 +223,7 @@ watch(() => route.path, () => {
     <div class="mobile-menu" :class="{ 'open': isMobileMenuOpen }">
       <div class="mobile-nav">
         <router-link
-            to="/home"
+            to="/"
             class="mobile-nav-item"
             :class="{ 'active': activeIndex === '2' }"
             @click="isMobileMenuOpen = false"
@@ -217,32 +234,6 @@ watch(() => route.path, () => {
             <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2"/>
           </svg>
           <span>首页</span>
-        </router-link>
-        <router-link
-            to="/exam/coating"
-            class="mobile-nav-item"
-            :class="{ 'active': activeIndex === '3' }"
-            @click="isMobileMenuOpen = false"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                  stroke="currentColor" stroke-width="2"/>
-          </svg>
-          <span>检测</span>
-        </router-link>
-        <router-link
-            to="/exam/report"
-            class="mobile-nav-item"
-            @click="isMobileMenuOpen = false"
-        >
-          <span>📄 报告解读</span>
-        </router-link>
-        <router-link
-            to="/exam/drugbox"
-            class="mobile-nav-item"
-            @click="isMobileMenuOpen = false"
-        >
-          <span>💊 药盒识别</span>
         </router-link>
         <div v-if="isAuthenticated" class="mobile-user-section">
           <div class="mobile-user-profile">

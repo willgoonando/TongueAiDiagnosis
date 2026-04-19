@@ -34,24 +34,24 @@ router_tongue_analysis = APIRouter()
 
 feature_map = {
     "Color of the tongue": {
-        0: "Pale white tongue",
-        1: "Light red tongue",
-        2: "Red tongue",
-        3: "Crimson tongue",
-        4: "Bluish-purple tongue"
+        0: "淡白舌",
+        1: "淡红舌",
+        2: "红舌",
+        3: "绛舌",
+        4: "青紫舌"
     },
     "Color of the tongue coating": {
-        0: "White coating",
-        1: "Yellow tongue coating",
-        2: "Gray-black tongue coating"
+        0: "白苔",
+        1: "黄苔",
+        2: "灰黑苔"
     },
     "Thickness of the tongue": {
-        0: "Thin",
-        1: "Thick"
+        0: "薄",
+        1: "厚"
     },
     "Decay and putrefaction of the tongue": {
-        0: "Putrefaction",
-        1: "decay"
+        0: "正常",
+        1: "腐腻"
     }
 }
 
@@ -61,12 +61,12 @@ def format_tongue_features(tongue_color,
                            rot_greasy):
     try:
         features = [
-            f"Color of the tongue: {feature_map['Color of the tongue'][tongue_color]}",
-            f"Color of the tongue coating: {feature_map['Color of the tongue coating'][coating_color]}",
-            f"Thickness of the tongue: {feature_map['Thickness of the tongue'][tongue_thickness]}",
-            f"Decay and putrefaction of the tongue: {feature_map['Decay and putrefaction of the tongue'][rot_greasy]}"
+            f"舌色：{feature_map['Color of the tongue'][tongue_color]}",
+            f"苔色：{feature_map['Color of the tongue coating'][coating_color]}",
+            f"舌体厚薄：{feature_map['Thickness of the tongue'][tongue_thickness]}",
+            f"腐腻情况：{feature_map['Decay and putrefaction of the tongue'][rot_greasy]}"
         ]
-        return "，".join(features)
+        return "；".join(features)
     except KeyError as e:
         missing_key = int(str(e).split("'")[1])
         return f"错误：检测到无效特征值 {missing_key}，请检查输入范围"
@@ -103,7 +103,7 @@ async def upload(sessionId: int,
                  db: Session = Depends(get_db),
                  ):
     if not user:
-        return schemas.BaseModel(
+        return schemas.BaseResponse(
             code=101,
             message="can not find user",
             data=None
@@ -130,7 +130,7 @@ async def upload(file_data: UploadFile = File(...),
                  db: Session = Depends(get_db)
                  ):
     if not user:
-        return schemas.BaseModel(
+        return schemas.BaseResponse(
             code=101,
             message="can not find user",
             data=None
@@ -144,7 +144,7 @@ async def upload(file_data: UploadFile = File(...),
     )
 
     if features.code != 0:
-        return schemas.BaseModel(
+        return schemas.BaseResponse(
             code=features.code,
             message="图片有问题",
             data=None,

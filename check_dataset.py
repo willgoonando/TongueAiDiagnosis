@@ -22,8 +22,13 @@ def check_yolo_dataset(data_yaml):
     base_path = Path(data['path'])
     train_path = base_path / data['train']
     val_path = base_path / data['val']
-    train_labels = base_path / 'labels' / 'train'
-    val_labels = base_path / 'labels' / 'val'
+    # 支持 Labels 和 labels 两种目录名
+    if (base_path / 'Labels' / 'train').exists():
+        train_labels = base_path / 'Labels' / 'train'
+        val_labels = base_path / 'Labels' / 'val'
+    else:
+        train_labels = base_path / 'labels' / 'train'
+        val_labels = base_path / 'labels' / 'val'
     
     # 检查目录
     errors = []
@@ -37,7 +42,7 @@ def check_yolo_dataset(data_yaml):
         errors.append(f"验证标注目录不存在: {val_labels}")
     
     if errors:
-        print("❌ 发现错误:")
+        print("[ERROR] 发现错误:")
         for error in errors:
             print(f"  - {error}")
         return False
@@ -46,8 +51,8 @@ def check_yolo_dataset(data_yaml):
     train_images = list(train_path.glob('*.jpg')) + list(train_path.glob('*.png'))
     val_images = list(val_path.glob('*.jpg')) + list(val_path.glob('*.png'))
     
-    print(f"✓ 训练图像: {len(train_images)} 张")
-    print(f"✓ 验证图像: {len(val_images)} 张")
+    print(f"[OK] 训练图像: {len(train_images)} 张")
+    print(f"[OK] 验证图像: {len(val_images)} 张")
     
     # 检查标注文件
     missing_labels = []
@@ -61,7 +66,7 @@ def check_yolo_dataset(data_yaml):
         print("   前10个:", missing_labels[:10])
         return False
     
-    print("✓ 所有训练图像都有对应的标注文件")
+    print("[OK] 所有训练图像都有对应的标注文件")
     
     # 检查标注格式
     format_errors = []
@@ -82,15 +87,15 @@ def check_yolo_dataset(data_yaml):
                     break
     
     if format_errors:
-        print("❌ 发现标注格式错误:")
+        print("[ERROR] 发现标注格式错误:")
         for error in format_errors[:5]:
             print(f"  - {error}")
         return False
     
-    print("✓ 标注格式正确")
-    print(f"✓ 类别数: {data['nc']}")
-    print(f"✓ 类别名称: {data['names']}")
-    print("\n✅ YOLOv5数据集检查通过！")
+    print("[OK] 标注格式正确")
+    print(f"[OK] 类别数: {data['nc']}")
+    print(f"[OK] 类别名称: {data['names']}")
+    print("\n[SUCCESS] YOLOv5数据集检查通过！")
     return True
 
 
@@ -144,12 +149,12 @@ def check_resnet_dataset(data_path):
                 total_images += len(images)
                 print(f"  {class_dir.name}: {len(images)} 张图像")
             
-            print(f"  ✓ {split} 总计: {total_images} 张图像")
+            print(f"  [OK] {split} 总计: {total_images} 张图像")
     
     if all_ok:
-        print("\n✅ ResNet数据集检查通过！")
+        print("\n[SUCCESS] ResNet数据集检查通过！")
     else:
-        print("\n❌ ResNet数据集检查失败，请修复上述问题")
+        print("\n[ERROR] ResNet数据集检查失败，请修复上述问题")
     
     return all_ok
 
@@ -178,4 +183,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
 

@@ -1,0 +1,35 @@
+性能测试脚本说明（与论文表 5-y 对应）
+====================================
+
+一、脚本位置
+  scripts/benchmark_performance.py
+
+二、运行前提
+  1) 已安装与项目一致的 Python 依赖（含 PyTorch、requests、yolov5、segment_anything 等），建议在 Anaconda 环境 AiDiagnosis-3.12 中执行。
+  2) 测 YOLO+SAM+ResNet：需 application/net/weights/ 下权重齐全；并准备一张清晰舌象图路径。
+  3) 测 Ollama：需本机已启动 Ollama，且可访问 http://localhost:11434（与 config.py 中 OLLAMA_PATH 一致）。
+
+三、命令示例（在项目根目录 d:\TD 下）
+  conda activate AiDiagnosis-3.12
+  cd d:\TD
+
+  REM 仅测 LLM（需 Ollama 已启动）
+  python scripts/benchmark_performance.py --ollama-runs 5
+
+  REM 仅测 CV 管线（需 --image）
+  python scripts/benchmark_performance.py --image D:\你的路径\tongue.jpg --runs 5 --skip-ollama
+
+  REM 全部测（推荐）
+  python scripts/benchmark_performance.py --image D:\你的路径\tongue.jpg --runs 5 --ollama-runs 5
+
+四、输出
+  - 控制台打印 Markdown 表（可粘贴到 Word）
+  - scripts/performance_results.json（原始 JSON，含各次耗时）
+
+五、指标含义（与论文一致）
+  - YOLO+SAM+ResNet：脚本内直接调用 TonguePredictor.__predict，不含 HTTP、队列轮询与数据库写入时间。
+  - LLM 首 token / 完整耗时：对 Ollama /api/chat 流式接口实测。
+  - 端到端（上传→首 token）：完整链路受网络、浏览器、队列影响；可用浏览器开发者工具 Network 看 TTFB，或由「CV 平均 + LLM 首 token 平均」作粗近似（脚本在两项都可测时会打印近似值）。
+
+六、论文填表
+  将 performance_results.json 与控制台表格中的平均值、最大值填入论文「表5-y」；测试次数与备注按实机填写。

@@ -50,7 +50,7 @@ def report_text(
     db: Session = Depends(get_db),
 ):
     if not user:
-        return schemas.BaseModel(code=101, message="can not find user", data=None)
+        return schemas.BaseResponse(code=101, message="can not find user", data=None)
     return explain_report_text(db=db, user_id=user.id, report_text=req.text, title=req.title)
 
 
@@ -63,7 +63,7 @@ def report_image(
     db: Session = Depends(get_db),
 ):
     if not user:
-        return schemas.BaseModel(code=101, message="can not find user", data=None)
+        return schemas.BaseResponse(code=101, message="can not find user", data=None)
     return explain_report_image(
         db=db,
         user_id=user.id,
@@ -80,7 +80,7 @@ def drugbox_text(
     db: Session = Depends(get_db),
 ):
     if not user:
-        return schemas.BaseModel(code=101, message="can not find user", data=None)
+        return schemas.BaseResponse(code=101, message="can not find user", data=None)
     return explain_drugbox_text(
         db=db,
         user_id=user.id,
@@ -99,7 +99,7 @@ def drugbox_image(
     db: Session = Depends(get_db),
 ):
     if not user:
-        return schemas.BaseModel(code=101, message="can not find user", data=None)
+        return schemas.BaseResponse(code=101, message="can not find user", data=None)
     return explain_drugbox_image(
         db=db,
         user_id=user.id,
