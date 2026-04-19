@@ -605,8 +605,8 @@ graph TD
 
 ## 📞 联系方式
 
-- **问题反馈**：[GitHub Issues](https://github.com/your-repo/issues)
-- **项目主页**：[GitHub Repository](https://github.com/your-repo)
+- **问题反馈**：[GitHub Issues](https://github.com/willgoonando/TongueAiDiagnosis/issues)
+- **项目主页**：[GitHub Repository](https://github.com/willgoonando/TongueAiDiagnosis)
 
 ---
 
@@ -622,11 +622,5 @@ graph TD
 
 ---
 
-**最后更新**：2024年12月
+**最后更新**：2026年4月
 
-**当前环境状态**：
-- ✅ 使用 Anaconda 环境：`AiDiagnosis-3.12` (Python 3.12.12)
-- ✅ labelImg 已配置并修复，可正常使用
-- ✅ SAM 已集成并优化（选择最佳掩码，使用掩码边界框）
-- ✅ 前端重复请求问题已修复
-- 📊 训练数据准备中：YOLOv5 训练图像 1177 张，已标注 4 张（进行中）
