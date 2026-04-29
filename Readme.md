@@ -6,6 +6,55 @@
 [![Vue 3.4](https://img.shields.io/badge/Vue-3.4.21-4FC08D.svg)](https://vuejs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg)](https://fastapi.tiangolo.com/)
 
+---
+
+## 📜 参考说明
+
+本项目基于 [TonguePicture-SKaRD/TongueDiagnosis](https://github.com/TonguePicture-SKaRD/TongueDiagnosis) 进行二次开发，感谢原项目的启发和基础架构支持。
+
+### 核心改进与差异
+
+| 类别 | 原项目 | 本项目的改进 |
+|------|--------|------------|
+| **推理引擎** | 固定 CPU 推理；每轮新建 SAM Predictor；无置信度过滤 | 支持 auto/cuda/cpu 模式切换；预创建并复用 SAM Predictor；增加置信度阈值过滤（`conf_threshold=0.5`） |
+| **设备支持** | 仅 CPU | 通过 `TORCH_DEVICE` 配置灵活选择推理设备 |
+| **模型格式** | 直接加载裸 state_dict | 支持 `checkpoint` 格式（含 `model_state_dict` 键），兼容更多训练保存方式 |
+| **注意力机制** | 无 | 新增 CBAM、ECA、SE 三种注意力模块（`application/net/model/attention/`），可用于改进 YOLOv5 检测性能 |
+| **Service 层** | 路由直接处理业务逻辑 | 新增完整 Service 层（`application/services/`），实现业务逻辑与路由分离，包含舌象/聊天/用户/OCR/扩展等服务 |
+| **OCR 识别** | 无 | 集成 EasyOCR，支持图片文字识别（离线模式） |
+| **扩展功能** | 仅舌象诊断 | 新增体检报告解读、药盒识别两大功能场景 |
+| **AI 对话** | 基础聊天 | 增强的 Ollama 推理控制（thinking 模式、参数调节、流式错误处理）；新增聊天历史管理和会话列表 |
+| **提示词** | 英文 | 中文中医老专家 Prompt，明确说明基于 AI 模型分析的特征 |
+| **训练管线** | 无训练脚本 | 完整训练工具集：YOLOv5 训练、ResNet 分类器训练、YOLOv5+注意力机制训练、数据集检查与标注工具 |
+| **训练数据** | 无 | 包含约 1000+ 张舌象标注图片（YOLO 格式） |
+| **前端界面** | 基础布局 | 全新对话式交互界面（聊天主页/侧边栏/输入组件/欢迎引导）；重构登录注册页面 |
+| **配置项** | 基础配置（8 项） | 大幅扩展至 15+ 项配置，涵盖设备选择、Ollama 控制、OCR 开关、场景 Prompt 等 |
+
+### 主要新增文件一览
+
+**后端新增：**
+- `application/services/`（6 个服务文件）
+- `application/net/model/attention/`（CBAM、ECA、SE 注意力模块）
+- `application/routes/extra_api.py`（OCR/报告/药盒 API）
+
+**前端新增：**
+- `components/auth/NewLogin.vue`（新版登录注册）
+- `components/chat/`（完整对话组件）
+- `views/ChatHome.vue`（聊天主页）
+
+**训练与工具：**
+- `train_resnet.py` / `train_yolov5.py` / `train_yolov5_attention.py`
+- `batch_crop_tongue.py` / `check_dataset.py` / `setup_dataset_structure.py`
+- 完整训练指南文档
+
+**数据资源：**
+- 约 1000+ 张舌象原图及 YOLO 格式标注（训练/验证/测试集）
+- 多个预训练/自训练模型权重文件
+
+---
+
+> ⚠️ **许可证说明**：本项目基于 AGPL-3.0 许可证发布。原项目代码部分同样遵循 AGPL-3.0 许可证。第三方模型（SAM、Deepseek 等）遵循其原始许可证。
+
 > 基于深度学习的多模态舌象分析系统，集成目标检测、图像分割和大语言模型，提供智能中医舌诊服务。
 
 ---
