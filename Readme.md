@@ -1,4 +1,4 @@
-# AI舌诊助手 (AI Tongue Diagnosis Assistant) 🩺🤖
+﻿# AI舌诊助手 (AI Tongue Diagnosis Assistant) 🩺🤖
 
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12.6-green.svg)](https://www.python.org/)
@@ -8,54 +8,42 @@
 
 ---
 
+> **拍一张舌苔照片，AI 自动分析舌象——然后你可以跟一个「AI 老中医」聊聊结果。**  
+> 支持舌象诊断、体检报告解读、药盒识别，一次配好就能离线使用。
+
+## 👀 界面一览
+
+| 登录界面 | 对话界面 | 历史记录 |
+|---|---|---|
+| ![登录界面](项目截图/舌诊图片1登录界面.png) | ![对话界面](项目截图/舌诊图片2对话界面.png) | ![历史记录](项目截图/舌诊图片3_历史记录界面.png) |
+
+---
+
 ## 📜 参考说明
 
 本项目基于 [TonguePicture-SKaRD/TongueDiagnosis](https://github.com/TonguePicture-SKaRD/TongueDiagnosis) 进行二次开发，感谢原项目的启发和基础架构支持。
 
-### 核心改进与差异
+### 与原项目的主要差异
 
-| 类别 | 原项目 | 本项目的改进 |
-|------|--------|------------|
-| **推理引擎** | 固定 CPU 推理；每轮新建 SAM Predictor；无置信度过滤 | 支持 auto/cuda/cpu 模式切换；预创建并复用 SAM Predictor；增加置信度阈值过滤（`conf_threshold=0.5`） |
-| **设备支持** | 仅 CPU | 通过 `TORCH_DEVICE` 配置灵活选择推理设备 |
-| **模型格式** | 直接加载裸 state_dict | 支持 `checkpoint` 格式（含 `model_state_dict` 键），兼容更多训练保存方式 |
-| **注意力机制** | 无 | 新增 CBAM、ECA、SE 三种注意力模块（`application/net/model/attention/`），可用于改进 YOLOv5 检测性能 |
-| **Service 层** | 路由直接处理业务逻辑 | 新增完整 Service 层（`application/services/`），实现业务逻辑与路由分离，包含舌象/聊天/用户/OCR/扩展等服务 |
-| **OCR 识别** | 无 | 集成 EasyOCR，支持图片文字识别（离线模式） |
-| **扩展功能** | 仅舌象诊断 | 新增体检报告解读、药盒识别两大功能场景 |
-| **AI 对话** | 基础聊天 | 增强的 Ollama 推理控制（thinking 模式、参数调节、流式错误处理）；新增聊天历史管理和会话列表 |
-| **提示词** | 英文 | 中文中医老专家 Prompt，明确说明基于 AI 模型分析的特征 |
-| **训练管线** | 无训练脚本 | 完整训练工具集：YOLOv5 训练、ResNet 分类器训练、YOLOv5+注意力机制训练、数据集检查与标注工具 |
-| **训练数据** | 无 | 包含约 1000+ 张舌象标注图片（YOLO 格式） |
-| **前端界面** | 基础布局 | 全新对话式交互界面（聊天主页/侧边栏/输入组件/欢迎引导）；重构登录注册页面 |
-| **配置项** | 基础配置（8 项） | 大幅扩展至 15+ 项配置，涵盖设备选择、Ollama 控制、OCR 开关、场景 Prompt 等 |
-
-### 主要新增文件一览
-
-**后端新增：**
-- `application/services/`（6 个服务文件）
-- `application/net/model/attention/`（CBAM、ECA、SE 注意力模块）
-- `application/routes/extra_api.py`（OCR/报告/药盒 API）
-
-**前端新增：**
-- `components/auth/NewLogin.vue`（新版登录注册）
-- `components/chat/`（完整对话组件）
-- `views/ChatHome.vue`（聊天主页）
-
-**训练与工具：**
-- `train_resnet.py` / `train_yolov5.py` / `train_yolov5_attention.py`
-- `batch_crop_tongue.py` / `check_dataset.py` / `setup_dataset_structure.py`
-- 完整训练指南文档
-
-**数据资源：**
-- 约 1000+ 张舌象原图及 YOLO 格式标注（训练/验证/测试集）
-- 多个预训练/自训练模型权重文件
+| 方面 | 原项目 | 本项目 |
+|------|--------|--------|
+| **推理引擎** | 固定 CPU；每轮新建 SAM Predictor | 支持 auto/cuda/cpu 切换；复用 SAM Predictor；置信度过滤 |
+| **注意力机制** | 无 | CBAM、ECA、SE 三种 Attention 模块 |
+| **后端架构** | 路由直写业务逻辑 | Service 层分离（6 个服务文件） |
+| **OCR 识别** | 无 | EasyOCR 离线识别 |
+| **扩展功能** | 仅舌象诊断 | + 体检报告解读 + 药盒识别 |
+| **AI 对话** | 基础聊天 | Thinking 模式、流式控制、会话历史管理 |
+| **提示词** | 英文 | 中文老中医 Prompt |
+| **训练管线** | 无 | 完整训练脚本 + 数据集工具 |
+| **训练数据** | 无 | ~1000 张舌象标注图片 |
+| **前端界面** | 基础布局 | 对话式交互界面 + 新版登录注册 |
+| **配置项** | 8 项 | 15+ 项（设备选择、Ollama 控制、OCR 开关等） |
 
 ---
 
 > ⚠️ **许可证说明**：本项目基于 AGPL-3.0 许可证发布。原项目代码部分同样遵循 AGPL-3.0 许可证。第三方模型（SAM、Deepseek 等）遵循其原始许可证。
 
-> 基于深度学习的多模态舌象分析系统，集成目标检测、图像分割和大语言模型，提供智能中医舌诊服务。
+> 基于深度学习的舌象分析系统，集成目标检测、图像分割和大语言模型，提供智能中医舌诊服务。
 
 ---
 
@@ -132,22 +120,13 @@ conda create -n AiDiagnosis-3.12 python=3.12
 conda activate AiDiagnosis-3.12
 ```
 
-**或者使用 venv（不推荐，已弃用）：**
-```bash
-# Windows
-python -m venv AiDiagnosis_env
-AiDiagnosis_env\Scripts\activate
-
-# macOS/Linux
-python3 -m venv AiDiagnosis_env
-source AiDiagnosis_env/bin/activate
-```
+&lt;!-- venv 方式已移除，推荐使用 conda -->
 
 #### 2.2 安装Python依赖
 
 ```bash
 # 确保已激活环境
-conda activate AiDiagnosis-3.12  # 或 source AiDiagnosis_env/bin/activate
+conda activate AiDiagnosis-3.12
 
 # 安装依赖
 pip install -r requirements.txt
@@ -159,19 +138,14 @@ pip install labelImg PyQt5==5.15.10 PyQt5-Qt5==5.15.2 PyQt5-sip==12.13.0
 pip install segment-anything
 ```
 
-**主要依赖包：**
-- `fastapi==0.110.0` - Web框架
-- `uvicorn==0.28.0` - ASGI服务器
-- `torch==2.2.1` - PyTorch深度学习框架
-- `torchvision==0.17.1` - 计算机视觉工具
-- `ultralytics==8.1.26` - YOLO目标检测
-- `yolov5==7.0.13` - YOLOv5模型
-- `easyocr==1.7.1` - OCR文字识别
-- `SQLAlchemy==2.0.28` - ORM数据库操作
-- `pydantic==2.6.3` - 数据验证
-- `python-jose==3.3.0` - JWT认证
-- `pillow==10.2.0` - 图像处理
-- `opencv-python==4.7.0.72` - 计算机视觉库
+**主要依赖（详见 requirements.txt）：**
+- `fastapi` / `uvicorn` — Web 框架
+- `torch` / `torchvision` — 深度学习
+- `ultralytics` / `yolov5` — YOLO 目标检测
+- `easyocr` — OCR 文字识别
+- `SQLAlchemy` — ORM 数据库
+- `python-jose` — JWT 认证
+- `pillow` / `opencv-python` — 图像处理
 
 #### 2.3 初始化数据库
 
@@ -238,7 +212,7 @@ class Settings:
     IMG_DB_PATH: str = "tongue"  # 数据库存储路径
     OLLAMA_PATH: str = "http://localhost:11434/api/chat"  # Ollama API地址
     LLM_NAME: str = "deepseek-r1:8b"  # LLM模型名称
-    APP_PORT: int = 5001  # 后端服务端口
+    APP_PORT: int = 5000  # 后端服务端口
     
     # 系统提示词（中文）
     SYSTEM_PROMPT: str = "你现在是一位精通中医舌诊的AI老中医..."
@@ -272,14 +246,12 @@ cd frontend
 npm install
 ```
 
-**主要依赖（实际安装版本）：**
-- `vue@3.4.21` - Vue.js框架
-- `vue-router@4.3.0` - 路由管理
-- `pinia@2.1.7` - 状态管理
-- `element-plus@2.6.1` - UI组件库
-- `axios@1.8.3` - HTTP客户端
-- `markdown-it@14.1.0` - Markdown渲染
-- `vite@5.4.14` - 构建工具
+**主要依赖：**
+- `vue` / `vue-router` / `pinia` — 核心框架
+- `element-plus` — UI 组件库
+- `axios` — HTTP 客户端
+- `markdown-it` — Markdown 渲染
+- `vite` — 构建工具
 
 #### 3.2 配置前端参数
 
@@ -434,18 +406,14 @@ TD/
 
 **终端1 - 启动后端：**
 ```bash
-# 激活 conda 环境（推荐）
+# 激活 conda 环境
 conda activate AiDiagnosis-3.12
-
-# 或激活 venv 环境（已弃用）
-# AiDiagnosis_env\Scripts\activate  # Windows
-# source AiDiagnosis_env/bin/activate  # macOS/Linux
 
 # 启动后端
 python run.py
 
 # 或使用批处理脚本（Windows）
-启动项目.bat
+python run.py
 ```
 
 **终端2 - 启动前端：**
@@ -485,13 +453,15 @@ npm run dev
 
 ```mermaid
 graph TD
-    A[用户上传图片] --> B[YOLOv5定位]
-    B --> C[SAM分割]
-    C --> D[ResNet50分类]
-    D --> E[四维特征向量]
-    E --> F[Deepseek-R1-8B]
-    F --> G[健康报告]
-    F --> H[对话咨询]
+    A[上传图片] --> B[保存+写数据库state=0]
+    B --> C[提交异步推理队列]
+    C --> D[YOLOv5定位]
+    D --> E[SAM分割]
+    E --> F[ResNet50分类]
+    F --> G[写回结果state=1]
+    G --> H[读取特征]
+    H --> I[Deepseek-R1-8B]
+    I --> J[健康报告 / 对话咨询]
 ```
 
 ### 技术栈
@@ -528,8 +498,8 @@ graph TD
 
 启动后端服务后，访问以下地址查看API文档：
 
-- **Swagger UI**: `http://localhost:5001/docs`
-- **ReDoc**: `http://localhost:5001/redoc`
+- **Swagger UI**: `http://localhost:5000/docs`
+- **ReDoc**: `http://localhost:5000/redoc`
 
 ### 主要API端点
 
@@ -672,4 +642,6 @@ graph TD
 ---
 
 **最后更新**：2026年4月
+
+
 
