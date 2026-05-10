@@ -8,7 +8,7 @@ const route = useRoute()
 const activeIndex = ref('')
 const isAuthenticated = ref(false)
 const userInfo = ref({
-  name: 'Test User',
+  name: '',
   avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
 })
 const isScrolled = ref(false)
@@ -35,7 +35,8 @@ const fetchUserInfo = async () => {
     if (res.data.code === 0) {
       isAuthenticated.value = true
       if (res.data.data) {
-        userInfo.value = { ...userInfo.value, ...res.data.data }
+        userInfo.value = { ...userInfo.value, ...res.data.data, name: res.data.data.email || userInfo.name }
+        console.log('userInfo after fetch:', JSON.stringify(userInfo.value))
       }
     }
   } catch (error) {
@@ -159,6 +160,9 @@ watch(() => route.path, () => {
                   <el-dropdown-item class="menu-item" @click="gotoExam('/')">
                     💊 药盒识别
                   </el-dropdown-item>
+                  <el-dropdown-item divided class="menu-item" @click="router.push('/pipeline')">
+                    🔬 流水线展示
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -174,7 +178,7 @@ watch(() => route.path, () => {
                 <div class="user-status"></div>
               </div>
               <div class="user-info">
-                <span class="user-name">{{ userInfo.name }}</span>
+                <span class="user-name">{{ userInfo.email || userInfo.name }}</span>
                 <span class="user-role">高级用户</span>
               </div>
               <div class="dropdown-arrow">
@@ -189,7 +193,7 @@ watch(() => route.path, () => {
                   <div class="user-card">
                     <img :src="userInfo.avatar" :alt="userInfo.name" class="user-card-avatar" />
                     <div class="user-card-info">
-                      <div class="user-card-name">{{ userInfo.name }}</div>
+                      <div class="user-card-name">{{ userInfo.email || userInfo.name }}</div>
                       <div class="user-card-email">{{ userInfo.email }}</div>
                     </div>
                   </div>
@@ -239,7 +243,7 @@ watch(() => route.path, () => {
           <div class="mobile-user-profile">
             <img :src="userInfo.avatar" :alt="userInfo.name" />
             <div class="mobile-user-info">
-              <span class="mobile-user-name">{{ userInfo.name }}</span>
+              <span class="mobile-user-name">{{ userInfo.email || userInfo.name }}</span>
               <span class="mobile-user-role">高级用户</span>
             </div>
           </div>

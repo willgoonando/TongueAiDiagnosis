@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from .routes import register_routes
 from .orm.database import engine, Base
 from .models import models
 from .core import get_current_user
 from .models import schemas
+import os
 
 # 请求频率限制缓存（用于 /api/get-token）
 _token_request_cache = {}
@@ -31,7 +33,15 @@ def create_app():
         allow_headers=["*"],
     )
     register_routes(app)
-    
+
+    # 挂载 pipeline 中间结果静态文件
+    pipeline_static_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "frontend", "public", "pipeline"
+    )
+    if os.path.exists(pipeline_static_dir):
+        app.mount("/pipeline", StaticFiles(directory=pipeline_static_dir), name="pipeline")
+
     # 添加兼容路由 /api/get-token（前端可能在使用）
     # 这个路由在未登录时返回友好响应，避免产生大量 401 错误日志
     # 添加简单的请求频率限制，减少不必要的请求

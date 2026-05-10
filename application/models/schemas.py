@@ -32,6 +32,7 @@ class Token(BaseModel):
 class UserBase(BaseModel):
     ID: int = None
     email: str
+    role: int = 0
 
 
 class UserAuth(UserBase):

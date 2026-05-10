@@ -2,6 +2,8 @@ venv
 AiDiagnosis_env/
 .idea
 frontend/node_modules
+admin/node_modules
+admin/dist
 __pycache__
 frontend/public/tongue
 /application/net/weights/rot_and_greasy.pth

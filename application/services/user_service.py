@@ -85,6 +85,7 @@ def get_user_info_service(user) -> schemas.InfoResponse:
     user_data = schemas.UserBase(
         ID=user.id,
         email=user.email,
+        role=getattr(user, "role", 0),
     )
 
     return schemas.InfoResponse(

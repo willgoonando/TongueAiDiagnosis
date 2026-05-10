@@ -1,0 +1,16 @@
+{
+  "steps": [
+    "original",
+    "yolo",
+    "sam",
+    "crop",
+    "features"
+  ],
+  "features": {
+    "code": 0,
+    "tongue_color": 1,
+    "tongue_coat_color": 2,
+    "thickness": 1,
+    "rot_and_greasy": 1
+  }
+}

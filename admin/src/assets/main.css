@@ -1,0 +1,24 @@
+/* 继承前端主项目的配色风格 */
+:root {
+  --primary-color: #409eff;
+  --success-color: #67c23a;
+  --warning-color: #e6a23c;
+  --danger-color: #f56c6c;
+  --bg-color: #f5f7fa;
+  --sidebar-bg: #304156;
+  --sidebar-text: #bfcbd9;
+  --sidebar-active: #409eff;
+  --card-bg: #ffffff;
+  --text-primary: #303133;
+  --text-secondary: #909399;
+  --border-color: #e4e7ed;
+}
+
+html, body, #app {
+  height: 100%;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}

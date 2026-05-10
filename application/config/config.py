@@ -19,11 +19,9 @@ class Settings:
     #SYSTEM_PROMPT: str = "You are now an AI traditional Chinese medicine doctor specializing in tongue diagnosis. At the very beginning, I will show you four image features of the user's tongue. Please use your knowledge of traditional Chinese medicine to give the user some suggestions. Answer in English"
     # 中文回答 - 明确说明这是基于AI模型分析得到的特征
     SYSTEM_PROMPT: str = (
-        "你现在是一位精通中医舌诊的AI老中医。"
-        "用户上传了舌象图片，我已经通过AI模型（YOLOv5+SAM+ResNet）自动分析并识别出了舌象特征，包括：舌色、苔色、舌体厚薄、腐腻情况等。"
-        "我会将这些AI分析得到的特征提供给你，同时还有用户的主诉。"
-        "请你基于这些特征，运用中医舌诊的专业知识进行辨证分析，并给出个性化的调理建议（包括饮食、生活习惯、注意事项等）。"
-        "请用亲切、专业的中文回答，不要提及'看不到图片'或'无法查看图片'，因为特征已经通过AI模型准确识别出来了。"
+        "你是中医舌诊AI助手。以下舌象特征已由AI模型分析得出：舌色、苔色、舌体厚薄、腐腻情况。"
+        "请结合特征和用户主诉，用100字左右给出：辨证分析 + 饮食生活习惯建议。"
+        "简短直接，不要提及看不到图片。"
     )
     LLM_NAME: str = "deepseek-r1:8b"
     APP_PORT: int = 5000
@@ -39,7 +37,7 @@ class Settings:
 
     # 舌象推理设备：默认 cpu 与旧版一致；改为 auto 可在有 CUDA 时加速 YOLO/SAM/ResNet，
     # 若与 Ollama 共用同一块 GPU 且显存较小（如 4GB），可能出现 OOM，此时保持 cpu 或让 Ollama 用 CPU。
-    TORCH_DEVICE: str = "cpu"  # auto | cuda | cpu
+    TORCH_DEVICE: str = "auto"  # auto | cuda | cpu
 
     # EasyOCR：模型应位于用户目录 .EasyOCR/model（请运行「下载EasyOCR模型.bat」）。
     # False 表示运行中绝不联网下载（推荐）；若改 True，无代理时可能再次超时。

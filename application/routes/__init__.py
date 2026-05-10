@@ -10,9 +10,13 @@ create_app() 在 application/__init__.py 中会调用 register_routes(app) 完�
 from .user_api import router_user
 from .model_api import router_tongue_analysis
 from .extra_api import router_extra
+from .pipeline_api import router_pipeline
+from .admin_api import router_admin
 from .ollama_used import *
 
 def register_routes(app):
     app.include_router(router_user, prefix="/api/user")
     app.include_router(router_tongue_analysis, prefix="/api/model")
     app.include_router(router_extra, prefix="/api/extra")
+    app.include_router(router_pipeline, prefix="/api")
+    app.include_router(router_admin, prefix="/api")

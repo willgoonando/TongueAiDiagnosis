@@ -19,6 +19,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)  # 自增主键
     email = Column(String(255))
     password = Column(String(255))
+    role = Column(Integer, default=0)  # 0=普通用户, 1=管理员
 
 
 class TongueAnalysis(Base):

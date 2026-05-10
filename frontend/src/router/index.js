@@ -2,6 +2,7 @@ import {createRouter, createWebHashHistory} from 'vue-router' // 使用 Hash 模
 import Login from "@/views/LoginRegister.vue";
 import Register from "@/views/LoginRegister.vue";
 import ChatHome from "@/views/ChatHome.vue";
+import PipelineDemo from "@/views/PipelineDemo.vue";
 
 const routes = [
     {
@@ -11,6 +12,11 @@ const routes = [
         meta: {
             requireAuth: false,  // 不需要强制登录
         },
+    },
+    {
+        path: '/pipeline',
+        name: 'pipeline',
+        component: PipelineDemo,
     },
     {
         path: '/login',

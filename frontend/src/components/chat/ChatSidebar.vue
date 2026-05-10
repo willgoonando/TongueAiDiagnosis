@@ -94,15 +94,19 @@
         >
           <div class="footer-link login-link user-dropdown-trigger">
             <el-icon><User /></el-icon>
-            <span v-if="!collapsed">{{ userInfo.name || '已登录' }}</span>
+            <span v-if="!collapsed">{{ userInfo.email || userInfo.name || '已登录' }}</span>
           </div>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item disabled class="user-info-item">
                 <div class="user-info-display">
                   <el-icon><User /></el-icon>
-                  <span>{{ userInfo.name || '用户' }}</span>
+                  <span>{{ userInfo.email || userInfo.name || '用户' }}</span>
                 </div>
+              </el-dropdown-item>
+              <el-dropdown-item command="pipeline" class="pipeline-item">
+                <el-icon><Monitor /></el-icon>
+                <span>🔬 流水线展示</span>
               </el-dropdown-item>
               <el-dropdown-item divided command="logout" class="logout-item">
                 <el-icon><SwitchButton /></el-icon>
@@ -119,7 +123,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Plus, ChatDotRound, Link, Download, User, SwitchButton } from '@element-plus/icons-vue'
+import { Plus, ChatDotRound, Link, Download, User, SwitchButton, Monitor } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -141,7 +145,7 @@ const activeSessionId = ref(null)
 // 用户信息
 const isAuthenticated = ref(false)
 const userInfo = ref({
-  name: 'Test User',
+  name: '',
   email: ''
 })
 
@@ -215,7 +219,7 @@ const loadUserInfo = async () => {
       if (response.data.code === 0) {
         isAuthenticated.value = true
         if (response.data.data) {
-          userInfo.value = { ...userInfo.value, ...response.data.data }
+          userInfo.value = { ...userInfo.value, ...response.data.data, name: response.data.data.email || userInfo.name }
         }
       }
     } catch (error) {
@@ -239,6 +243,11 @@ const handleLogin = () => {
 
 // 处理用户菜单命令
 const handleUserCommand = async (command) => {
+  if (command === 'pipeline') {
+    // 跳转到流水线展示页面
+    window.open(`${window.location.origin}/#/pipeline`, '_blank')
+    return
+  }
   if (command === 'logout') {
     try {
       await ElMessageBox.confirm(
@@ -255,7 +264,7 @@ const handleUserCommand = async (command) => {
       localStorage.removeItem('token')
       isAuthenticated.value = false
       userInfo.value = {
-        name: 'Test User',
+        name: '',
         email: ''
       }
       sessions.value = []
@@ -560,6 +569,17 @@ onMounted(() => {
 
 .logout-item:hover {
   background-color: #fee;
+}
+
+.pipeline-item {
+  color: #667eea;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pipeline-item:hover {
+  background-color: #eef2ff;
 }
 
 .chat-sidebar.collapsed .logo-text,
