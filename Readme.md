@@ -69,6 +69,18 @@
 - 自然语言问答咨询
 - 多轮对话历史记录
 
+### 5. 管理后台 ⭐
+- **系统概览**：注册用户、舌诊记录、对话数据总览卡片
+- **用户管理**：用户列表、搜索、新增/编辑/删除、CSV导出
+- **舌诊记录**：记录列表、状态筛选、删除、CSV导出
+- **数据分析**：舌色/苔色/厚薄/腐腻分布进度条+ECharts柱状图/饼图、用户对话活跃度图
+- **对话管理**：会话列表、搜索、用户筛选、对话详情预览、CSV导出
+- **独立运行**：Vue3 + Element Plus + ECharts，端口5174
+
+### 6. 流水线讲解文档 ⭐
+- 14篇系统文档覆盖项目全链路：架构概览、前端调用、后端Service、推理引擎、YOLOv5定位、SAM分割、ResNet50分类、注意力机制、Ollama诊断、数据库ORM、OCR扩展、答辩亮点
+- 配套可视化Demo演示页面（`/pipeline-demo`）
+
 ---
 
 ## 🚀 快速开始
@@ -327,7 +339,9 @@ TD/
 │   │   ├── user_api.py                 # 用户API
 │   │   ├── model_api.py                # 模型API
 │   │   ├── extra_api.py                # 扩展功能API
-│   │   └── ollama_used.py              # Ollama集成
+│   │   ├── ollama_used.py              # Ollama集成
+│   │   ├── admin_api.py                # 管理后台API ⭐
+│   │   └── pipeline_api.py             # 流水线演示API ⭐
 │   └── services/                      # 业务逻辑层
 │       ├── user_service.py             # 用户服务
 │       ├── tongue_service.py           # 舌象服务
@@ -363,7 +377,44 @@ TD/
 │       │       └── WelcomeSection.vue  # 欢迎页
 │       └── views/                      # 页面视图
 │           ├── ChatHome.vue            # 聊天主页
-│           └── LoginRegister.vue       # 登录注册页
+│           ├── LoginRegister.vue       # 登录注册页
+│           └── PipelineDemo.vue        # 流水线演示页 ⭐
+│
+├── admin/                              # 管理后台（独立项目）⭐
+│   ├── package.json                    # 前端依赖配置
+│   ├── vite.config.js                  # Vite配置（端口5174）
+│   ├── index.html                      # HTML入口
+│   └── src/
+│       ├── App.vue                     # 根组件
+│       ├── main.js                     # 应用入口
+│       ├── router/index.js             # 路由配置
+│       ├── api/index.js                # API封装（含CSV导出）
+│       └── views/
+│           ├── Login.vue               # 管理员登录
+│           ├── Layout.vue              # 侧边导航布局
+│           ├── Dashboard.vue           # 系统概览
+│           ├── Users.vue               # 用户CRUD管理
+│           ├── Records.vue             # 舌诊记录管理
+│           ├── Analysis.vue            # 舌象数据分析（含ECharts图表）
+│           └── Sessions.vue            # 对话管理
+│
+├── docs/                               # 项目文档 ⭐
+│   └── 答辩项目流程/
+│       └── pipeline/                   # 舌诊AI流水线讲解（14篇）
+│           ├── 00-目录总览.md
+│           ├── 01-项目架构概览.md
+│           ├── 02-前端调用链路.md
+│           ├── 03-后端路由与Service层.md
+│           ├── 04-推理引擎predict.py详解.md
+│           ├── 05-YOLOv5舌体定位.md
+│           ├── 06-SAM精细分割.md
+│           ├── 07-ResNet50四维分类.md
+│           ├── 08-注意力机制优化.md
+│           ├── 09-OllamaLLM诊断生成.md
+│           ├── 10-数据库与ORM设计.md
+│           ├── 11-OCR与扩展功能.md
+│           ├── 12-答辩亮点与工作量总结.md
+│           └── 13-调用全链路一图流.md
 │
 └── 训练相关文件/
     ├── train_resnet.py                 # ResNet训练脚本
@@ -422,9 +473,16 @@ cd frontend
 npm run dev
 ```
 
+**终端3 - 启动管理后台（可选）：** ⭐
+```bash
+cd admin
+npm run dev
+```
+
 ### 2. 访问应用
 
-打开浏览器访问：`http://localhost:5173`
+打开浏览器访问：`http://localhost:5173`（主前端）
+管理后台：`http://localhost:5174`（需管理员账号登录）
 
 ### 3. 功能使用
 
@@ -519,6 +577,20 @@ graph TD
 - `POST /api/extra/report/image` - 报告解读（图片）
 - `POST /api/extra/drugbox/text` - 药盒识别（文本）
 - `POST /api/extra/drugbox/image` - 药盒识别（图片）
+
+#### 管理后台API ⭐
+- `GET /api/admin/stats` - 系统统计
+- `GET /api/admin/stats/user-chats` - 用户对话数统计
+- `GET /api/admin/users` - 用户列表（分页/搜索/CSV导出）
+- `POST /api/admin/user` - 新增用户
+- `PUT /api/admin/user/{id}` - 编辑用户
+- `DELETE /api/admin/user/{id}` - 删除用户
+- `GET /api/admin/records` - 舌诊记录列表（筛选/CSV导出）
+- `DELETE /api/admin/record/{id}` - 删除舌诊记录
+- `GET /api/admin/analysis-stats` - 舌象特征统计
+- `GET /api/admin/chat-sessions` - 会话列表（搜索/筛选/CSV导出）
+- `GET /api/admin/chat-session/{id}` - 会话详情
+- `DELETE /api/admin/chat-session/{id}` - 删除会话
 
 ---
 
